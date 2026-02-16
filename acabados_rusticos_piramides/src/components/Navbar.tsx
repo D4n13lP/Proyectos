@@ -195,23 +195,24 @@ export default function Navbar({
 
       {/* DRAWER / SIDE MENU */}
       <aside
-        className={`fixed top-0 left-0 h-full w-72 bg-white z-50 shadow-2xl transform transition-transform
-        ${drawerOpen ? "translate-x-0" : "-translate-x-full"}`}
+        className={`fixed top-0 left-0 h-full w-72 bg-gradient-to-r from-[#1A2539] to-[#0F172A]
+                    z-50 shadow-2xl transform transition-transform
+                    ${drawerOpen ? "translate-x-0" : "-translate-x-full"}`}
         aria-hidden={!drawerOpen}
       >
         <div className="h-14 px-4 flex items-center justify-between border-b">
-          <span className="font-semibold text-slate-900">Menú principal</span>
+          <span className="font-semibold text-white">Menú principal</span>
           <button
             type="button"
             onClick={() => setDrawerOpen(false)}
-            className="h-9 w-9 rounded-lg hover:bg-slate-100 transition grid place-items-center"
+            className="h-9 w-9 rounded-lg hover:bg-white/10 transition grid place-items-center"
             aria-label="Cerrar menú"
           >
-            ✕
+            <span className="text-white hover:text-emerald-400">x</span>
           </button>
         </div>
 
-        <div className="p-2">
+        <div className="p-4 flex flex-col items-center gap-1 w-full">
           <SideItem label="Inventario" onClick={() => navigate("/Inventario")} />
           <SideItem label="Productos" onClick={() => navigate("/Productos")} />
           <SideItem label="Proveedores" onClick={() => navigate("/Proveedores")} />
@@ -261,7 +262,7 @@ function SideItem({
     <button
       type="button"
       onClick={onClick}
-      className="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-100 transition text-slate-900"
+      className= "w-full max-w-xs text-left px-4 py-3 rounded-xl cursor-pointer  hover:text-emerald-400 hover:bg-white/10 transition text-white"
     >
       {label}
     </button>
