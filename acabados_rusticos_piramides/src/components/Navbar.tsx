@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import menuIcon from "../assets/icons/menu.png";
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
+import { ROUTES } from "../routes";
 
 
 type NavHandler = (path: string) => void;
@@ -21,8 +23,9 @@ export default function Navbar({
   avatarSrc,
   onAvatarClick,
 }: NavbarProps) {
-  const navigate: NavHandler =
-    onNavigate ?? ((path) => console.log("Navigate to:", path));
+  const routerNavigate = useNavigate();
+  const navigate: NavHandler = onNavigate ?? routerNavigate;
+
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [salesOpen, setSalesOpen] = useState(false);
@@ -50,6 +53,12 @@ export default function Navbar({
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
   }, []);
+
+  function go(path: string) {
+    setSalesOpen(false);
+    setDrawerOpen(false);
+    navigate(path);
+  }
 
   function toggleDrawer() {
     setDrawerOpen((v) => !v);
@@ -129,17 +138,11 @@ export default function Navbar({
                     <div className="p-2">
                       <DropdownItemDark
                         label="Registrar venta"
-                        onClick={() => {
-                          setSalesOpen(false);
-                          navigate("/registrar-venta");
-                        }}
+                        onClick={() => go("/sales/register")}
                       />
                       <DropdownItemDark
                         label="Registrar pedido"
-                        onClick={() => {
-                          setSalesOpen(false);
-                          navigate("/registrar-pedido");
-                        }}
+                        onClick={() => go("/orders/register")}
                       />
                     </div>
                   </div>
@@ -149,11 +152,7 @@ export default function Navbar({
               {/* Indicadores */}
               <button
                 type="button"
-                onClick={() => {
-                  setSalesOpen(false);
-                  setDrawerOpen(false);
-                  navigate("/indicadores");
-                }}
+                onClick={() => go("/")}
                 className={navBtn}
               >
                 <span className="opacity-90">📈</span>
@@ -213,14 +212,14 @@ export default function Navbar({
         </div>
 
         <div className="p-4 flex flex-col items-center gap-1 w-full">
-          <SideItem label="Inventario" onClick={() => navigate("/Inventario")} />
-          <SideItem label="Productos" onClick={() => navigate("/Productos")} />
-          <SideItem label="Proveedores" onClick={() => navigate("/Proveedores")} />
-          <SideItem label="Clientes" onClick={() => navigate("/Clientes")} />
-          <SideItem label="Descuentos" onClick={() => navigate("/Descuentos")} />
-          <SideItem label="Ventas y pedidos" onClick={() => navigate("/Ventas y pedidos")} />
-          <SideItem label="Pedidos" onClick={() => navigate("/Pedidos")} />
-          <SideItem label="Reporte de ventas" onClick={() => navigate("/Reporte de ventas")} />
+          <SideItem label="Inventario" onClick={() => go(ROUTES.INVENTORY)} />
+          <SideItem label="Productos" onClick={() => go(ROUTES.PRODUCTS)} />
+          <SideItem label="Proveedores" onClick={() => go(ROUTES.SUPPLIERS)} />
+          <SideItem label="Clientes" onClick={() => go(ROUTES.CLIENTS)} />
+          <SideItem label="Descuentos" onClick={() => go(ROUTES.DISCOUNTS)} />
+          <SideItem label="Ventas y pedidos" onClick={() => go(ROUTES.SALES.ROOT)} />
+          <SideItem label="Pedidos" onClick={() => go(ROUTES.ORDERS.ROOT)} />
+          <SideItem label="Reporte de ventas" onClick={() => go(ROUTES.SALES.REPORT)} />
         </div>
       </aside>
     </>
