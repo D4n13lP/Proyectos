@@ -363,7 +363,7 @@ export default function Inventory() {
                   ))
                 ) : (
                   // MOCK VISUAL: Solo se muestra si el array está vacío (Estado inicial)
-                  Array(5).fill(0).map((_, i) => (
+                  Array(1).fill(0).map((_, i) => (
                     <tr key={`empty-${i}`} className="h-11">
                       {columnas.map((_, j) => (
                         <td key={`cell-${j}`} className="border-r border-gray-100 last:border-r-0"></td>

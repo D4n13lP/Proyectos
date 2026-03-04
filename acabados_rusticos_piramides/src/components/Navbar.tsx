@@ -84,101 +84,87 @@ export default function Navbar({
     <>
       {/* NAVBAR */}
       <nav className="fixed top-0 left-0 w-full h-14 z-50 bg-gradient-to-r from-slate-900 to-slate-800 text-white">
-        <div className="h-full px-6 flex items-center">
-          {/* IZQUIERDA */}
-          <div className="w-1/3 flex items-center">
-            <button
-              type="button"
-              onClick={toggleDrawer}
-              className={iconBtn}
-              aria-label="Abrir menú"
-              aria-expanded={drawerOpen}
-            >
-              <img src={menuIcon} alt="Menú" className="h-6 w-6" />
-            </button>
-          </div>
-
-          {/* CENTRO */}
-          <div className="w-1/3 flex items-center justify-center">
-            <div className="flex items-center gap-12">
-              {/* Ventas y pedidos (dropdown) */}
-              <div className="relative" ref={salesRef}>
-                <button
-                  type="button"
-                  onClick={toggleSales}
-                  className={navBtn}
-                  aria-haspopup="menu"
-                  aria-expanded={salesOpen}
-                >
-                  <span className="opacity-90">🧾</span>
-                  <span className="font-medium">Ventas y pedidos</span>
-                  <svg
-                    className={`h-4 w-4 transition-transform ${
-                      salesOpen ? "rotate-180" : ""
-                    }`}
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M19 9l-7 7-7-7"
-                    />
-                  </svg>
-                </button>
-
-                {salesOpen && (
-                  <div
-                    role="menu"
-                    className="absolute left-1/2 -translate-x-1/2 mt-3 w-72 rounded-2xl
-                               bg-slate-800/95 border border-white/10 shadow-xl backdrop-blur z-50"
-                  >
-                    <div className="p-2">
-                      <DropdownItemDark
-                        label="Registrar venta"
-                        onClick={() => go("/sales/register")}
-                      />
-                      <DropdownItemDark
-                        label="Registrar pedido"
-                        onClick={() => go("/orders/register")}
-                      />
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Indicadores */}
+          {/* Cambiamos px-6 por px-4 para ganar espacio en laterales de móvil */}
+          <div className="h-full px-4 flex items-center justify-between">
+            
+            {/* IZQUIERDA - Botón Menú (Ocupa el espacio necesario) */}
+            <div className="flex-1 flex items-center">
               <button
                 type="button"
-                onClick={() => go("/")}
-                className={navBtn}
+                onClick={toggleDrawer}
+                className={iconBtn}
+                aria-label="Abrir menú"
+                aria-expanded={drawerOpen}
               >
-                <span className="opacity-90">📈</span>
-                <span className="font-medium">Indicadores</span>
+                <img src={menuIcon} alt="Menú" className="h-6 w-6" />
+              </button>
+            </div>
+
+            {/* CENTRO - Contenedor de navegación */}
+            <div className="flex items-center justify-center">
+              <div className="flex items-center gap-4 lg:gap-12">
+                
+                {/* Ventas y pedidos (HIDDEN EN MÓVIL) */}
+                <div className="relative hidden md:block" ref={salesRef}>
+                  <button
+                    type="button"
+                    onClick={toggleSales}
+                    className={navBtn}
+                    aria-haspopup="menu"
+                    aria-expanded={salesOpen}
+                  >
+                    <span className="opacity-90 text-xl">🧾</span>
+                    <span className="font-medium whitespace-nowrap">Ventas y pedidos</span>
+                    <svg
+                      className={`h-4 w-4 transition-transform ${salesOpen ? "rotate-180" : ""}`}
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+
+                  {/* Menú Dropdown (Tu lógica original intacta) */}
+                  {salesOpen && (
+                    <div
+                      role="menu"
+                      className="absolute left-1/2 -translate-x-1/2 mt-3 w-72 rounded-2xl
+                                bg-slate-800/95 border border-white/10 shadow-xl backdrop-blur z-50"
+                    >
+                      <div className="p-2">
+                        <DropdownItemDark label="Registrar venta" onClick={() => go("/sales/register")} />
+                        <DropdownItemDark label="Registrar pedido" onClick={() => go("/orders/register")} />
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Indicadores (SIEMPRE VISIBLE) */}
+                <button type="button" onClick={() => go("/")} className={navBtn}>
+                  <span className="opacity-90 text-xl">📈</span>
+                  <span className="font-medium">Indicadores</span>
+                </button>
+              </div>
+            </div>
+
+            {/* DERECHA - Avatar (Ocupa el espacio necesario) */}
+            <div className="flex-1 flex items-center justify-end">
+              <button
+                type="button"
+                onClick={onAvatarClick ?? (() => navigate("/perfil"))}
+                className="h-10 w-10 rounded-full overflow-hidden ring-2 ring-white/10 hover:ring-white/25 transition"
+              >
+                <img
+                  src={avatarSrc ?? "https://via.placeholder.com/80"}
+                  alt="Perfil"
+                  className="h-full w-full object-cover"
+                />
               </button>
             </div>
           </div>
-
-          {/* DERECHA (AVATAR) */}
-          <div className="w-1/3 flex items-center justify-end">
-            <button
-              type="button"
-              onClick={onAvatarClick ?? (() => navigate("/perfil"))}
-              className="h-10 w-10 rounded-full overflow-hidden ring-2 ring-white/10 hover:ring-white/25 transition"
-              aria-label="Perfil"
-              title="Perfil"
-            >
-              <img
-                src={avatarSrc ?? "https://via.placeholder.com/80"}
-                alt="Perfil"
-                className="h-full w-full object-cover"
-              />
-            </button>
-          </div>
-        </div>
-      </nav>
+        </nav>
 
       {/* Espaciador para que el contenido no quede debajo del navbar fijo */}
       <div className="h-14" />
