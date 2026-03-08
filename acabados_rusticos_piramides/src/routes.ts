@@ -5,7 +5,7 @@ export const ROUTES = {
   PRODUCTS: "/products",
   SUPPLIERS: "/suppliers",
   CLIENTS: "/clients",
-  DISCOUNTS: "/discounts",
+  // DISCOUNTS: "/discounts",
 
   SALES: {
     ROOT: "/sales",
@@ -19,5 +19,14 @@ export const ROUTES = {
     REPORT: "/orders/report",
   },
 
+  DISCOUNTS: {
+    ROOT: "/discounts",
+    PROMOTION: "/discounts/promotions",
+    CLIENT_DISCOUNT: "/discounts/clients",
+    DISCOUNT_ADJUSTMENT: "/discounts/adjustments",
+  },
+
   ACCOUNT: "/account",
 } as const;
+
+  
