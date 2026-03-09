@@ -8,6 +8,9 @@ import Clients_Page from './views/Clients_Page'
 import DashboardPage from './views/DashboardPage'
 import Deliverymen_Page from './views/Deliverymen_Page'
 import Discounts_Page from './views/Discounts_Page'
+import PromotionSetupPage from './views/PromotionSetupPage'
+import ClientsDiscountPage from './views/ClientsDiscountPage'
+import DiscountAdjustmentPage from './views/DiscountAdjustmentPage'
 
 import LoginDisplay_Page from './views/LoginDisplay_Page'
 import ManageAccount_Page from './views/ManageAccount_Page'
@@ -44,7 +47,10 @@ export default function AppRouter() {
           <Route path="products/add" element={<AddProducts_Page />} />
           <Route path={ROUTES.CLIENTS} element={<Clients_Page />} />
           <Route path="deliverymen" element={<Deliverymen_Page />} />
-          <Route path={ROUTES.DISCOUNTS} element={<Discounts_Page />} />
+          <Route path={ROUTES.DISCOUNTS.ROOT} element={<Discounts_Page />} />
+          <Route path={ROUTES.DISCOUNTS.PROMOTION} element={<PromotionSetupPage />} />
+          <Route path={ROUTES.DISCOUNTS.CLIENT_DISCOUNT} element={<ClientsDiscountPage />} />
+          <Route path={ROUTES.DISCOUNTS.DISCOUNT_ADJUSTMENT} element={<DiscountAdjustmentPage />} />
           <Route path={ROUTES.INVENTORY} element={<Inventory_Page />} />
           <Route path="account/manage" element={<ManageAccount_Page />} />
           <Route path={ROUTES.ORDERS.ROOT} element={<Orders_Page />} />
