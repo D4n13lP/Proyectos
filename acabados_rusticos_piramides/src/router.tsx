@@ -27,6 +27,7 @@ import Suppliers_Page from './views/Suppliers_Page'
 import UpdateOrder_Page from './views/UpdateOrder_Page'
 import WatchProducts_Page from './views/WatchProducts_Page'
 import Inventory_Page from './views/Inventory_Page';
+import ProductCatalog_Page from './views/ProductCatalog_Page';
 
 
 
@@ -55,7 +56,8 @@ export default function AppRouter() {
           <Route path="account/manage" element={<ManageAccount_Page />} />
           <Route path={ROUTES.ORDERS.ROOT} element={<Orders_Page />} />
           <Route path={ROUTES.ORDERS.REPORT} element={<OrdersReports_Page />} />
-          <Route path="products" element={<Products_Page />} />
+          <Route path={ROUTES.PRODUCTS.ROOT} element={<Products_Page />} />
+          <Route path={ROUTES.PRODUCTS.PRODUCT_CATALOG} element={<ProductCatalog_Page />}/>
           <Route path="orders/register" element={<RegisterOrder_Page />} />
           <Route path="products/register" element={<RegisterProducts_Page />} />
           <Route path="sales/register" element={<RegisterSale_Page />} />

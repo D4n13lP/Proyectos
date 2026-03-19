@@ -40,7 +40,7 @@ export default function ProductsMenu_Page() {
           <MenuCard 
             label="Ver productos" 
             icon={Package} 
-            path="/products/inventory" 
+            path="/products/catalog" 
             bgColor="bg-[#3ab0e2]" 
           />
           

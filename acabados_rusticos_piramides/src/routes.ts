@@ -1,11 +1,19 @@
+  
+import ProductCatalog from "./views/ProductCatalog_Page";
+
 export const ROUTES = {
   LOGIN: "/login",
   DASHBOARD: "/",
   INVENTORY: "/inventory",
-  PRODUCTS: "/products",
+  // PRODUCTS: "/products",
   SUPPLIERS: "/suppliers",
   CLIENTS: "/clients",
   // DISCOUNTS: "/discounts",
+
+  PRODUCTS: {
+    ROOT: "/products",
+    PRODUCT_CATALOG: "/products/catalog",
+  },
 
   SALES: {
     ROOT: "/sales",
