@@ -159,7 +159,7 @@ export default function ProductCatalog_Page() {
           descripcion: 'Esta maceta está hecha de resina de alta resistencia con acabados pintados a mano. Ideal para interiores.' 
         },
         // Puedes agregar más objetos aquí para llenar el catálogo
-        { id: 'M-02', nombre: 'Maceta Puerquito', imagen: 'https://via.placeholder.com/150', precio: 180.0, categoria: 'Macetas' },
+        { id: 'M-02', nombre: 'Maceta Puerquito', imagenes:[ 'https://via.placeholder.com/150',], precio: 180.0, categoria: 'Macetas' },
       ])
     }
   }, [setProducts, setCategories, products.length])  // Dependencias para que React sepa cuándo ejecutarlo

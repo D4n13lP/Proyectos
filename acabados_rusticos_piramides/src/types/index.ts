@@ -19,7 +19,7 @@ export const ProductSchema = z.object({
 // Tipos basados en los esquemas
 export type Category = z.infer<typeof CategorySchema>;
 export type Product = z.infer<typeof ProductSchema>;
-export type ProductResponse = z.array(ProductSchema);
+// export type ProductResponse = z.array(ProductSchema);
 
 // Esquema para búsquedas (similar a SearchRecipeSchema)
 export const SearchProductSchema = z.object({

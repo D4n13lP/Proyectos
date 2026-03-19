@@ -13,7 +13,7 @@ export default function ProductCard({ product }: ProductCardProps) {
     <div className="bg-white border border-gray-100 rounded-lg shadow-sm hover:shadow-lg transition-all overflow-hidden flex flex-col w-full max-w-[200px]">
       <div className="overflow-hidden aspect-square bg-gray-50">
         <img
-          src={product.imagen}
+          src={product.imagenes[0]}
           alt={product.nombre}
           className="w-full h-full object-cover hover:scale-125 transition-transform duration-500 hover:rotate-2"
         />
