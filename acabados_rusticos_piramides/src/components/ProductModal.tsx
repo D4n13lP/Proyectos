@@ -180,6 +180,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { X, ChevronLeft, ChevronRight, Maximize2, UploadCloud, Edit3, Trash2, Check, RotateCcw } from 'lucide-react'
 import { useAppStore } from '../stores/useAppStore'
+import { useNavigate } from 'react-router-dom'
 
 export default function ProductModal() {
   // --- STORE ---
@@ -195,6 +196,8 @@ export default function ProductModal() {
   const [errors, setErrors] = useState<Record<string, string>>({})
   
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const navigate = useNavigate();
 
   // Sincronizar datos al abrir
   useEffect(() => {
@@ -340,8 +343,14 @@ export default function ProductModal() {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4 mt-8">
-                <button className="flex-1 bg-[#3ab0e2] hover:bg-emerald-600 text-white py-4 rounded-2xl font-black text-xs transition-all shadow-lg active:scale-95 cursor-pointer uppercase tracking-widest">
-                  Ver Proveedor
+                <button 
+                  onClick={() => {
+                    closeModal(); // Cerramos el modal antes de navegar
+                    navigate('/suppliers/detail'); // Ruta dinámica según el ID del proveedor
+                  }}
+                  className="flex-1 bg-[#3ab0e2] hover:bg-emerald-600 text-white py-2 rounded-lg font-bold text-xs transition-all cursor-pointer"
+                  >
+                    VER PROVEEDOR
                 </button>
                 <button className="flex-1 border-2 border-gray-200 text-gray-300 py-4 rounded-2xl font-black text-xs cursor-not-allowed uppercase tracking-widest">
                   Ver Expectativa Venta

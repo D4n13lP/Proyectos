@@ -6,13 +6,18 @@ export const ROUTES = {
   DASHBOARD: "/",
   INVENTORY: "/inventory",
   // PRODUCTS: "/products",
-  SUPPLIERS: "/suppliers",
+  //SUPPLIERS: "/suppliers",
   CLIENTS: "/clients",
   // DISCOUNTS: "/discounts",
 
   PRODUCTS: {
     ROOT: "/products",
     PRODUCT_CATALOG: "/products/catalog",
+  },
+
+  SUPPLIERS: {
+    ROOT: "/suppliers",
+    SUPPLIER_DETAIL: "/suppliers/detail",
   },
 
   SALES: {
