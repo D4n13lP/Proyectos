@@ -47,7 +47,7 @@ export default function SalesReport_Page() {
         <img src={logoEmpresa} alt="Logo" className="h-16 md:h-20 object-contain" />
       </div>
 
-      <main className="w-full max-w-4xl mx-auto">
+      <main className="w-full max-w-4xl mx-auto flex flex-col items-center">
         {/* BOTÓN REGRESAR */}
         {/* <button 
           onClick={() => navigate(-1)} 
@@ -58,18 +58,18 @@ export default function SalesReport_Page() {
         </button> */}
 
         {/* TÍTULO CON ICONO A LA DERECHA */}
-        <div className="flex items-center gap-6 mb-12">
+        <div className="flex items-center justify-center gap-6 mb-12 w-full">
           <h1 className="text-4xl md:text-5xl font-normal text-[#e65100]">Reporte de ventas</h1>
           <TrendingUp className="text-[#e65100]" size={60} strokeWidth={1.5} />
         </div>
 
-        <div className="space-y-12">
-          <h2 className="text-2xl text-gray-700 font-light">Selecciona una periodo para generar reporte</h2>
+        <div className="space-y-12 w-full flex flex-col items-center">
+          <h2 className="text-2xl text-gray-700 font-light text-center">Selecciona una periodo para generar reporte</h2>
 
           {/* SECCIÓN DE FECHAS */}
-          <div className="space-y-6">
+          <div className="space-y-6 w-full flex flex-col items-center">
             {/* INICIO */}
-            <div className={`flex flex-col md:flex-row items-center gap-8 transition-opacity ${isReporteDia ? 'opacity-40 pointer-events-none' : ''}`}>
+            <div className={`flex flex-col md:flex-row items-center justify-center gap-8 transition-opacity ${isReporteDia ? 'opacity-40 pointer-events-none' : ''}`}>
               <span className="text-2xl w-24">Inicio</span>
               <div className="flex gap-4">
                 <input type="text" placeholder="MM" className="w-20 p-2 border-2 border-gray-200 rounded text-center outline-none focus:border-[#3ab0e2]" value={fechaInicio.mm} onChange={(e) => setFechaInicio({...fechaInicio, mm: e.target.value})} />
@@ -79,7 +79,7 @@ export default function SalesReport_Page() {
             </div>
 
             {/* FIN */}
-            <div className={`flex flex-col md:flex-row items-center gap-8 transition-opacity ${isReporteDia ? 'opacity-40 pointer-events-none' : ''}`}>
+            <div className={`flex flex-col md:flex-row items-center justify-center gap-8 transition-opacity ${isReporteDia ? 'opacity-40 pointer-events-none' : ''}`}>
               <span className="text-2xl w-24">Fin</span>
               <div className="flex gap-4">
                 <input type="text" placeholder="MM" className="w-20 p-2 border-2 border-gray-200 rounded text-center outline-none focus:border-[#3ab0e2]" value={fechaFin.mm} onChange={(e) => setFechaFin({...fechaFin, mm: e.target.value})} />
@@ -90,7 +90,7 @@ export default function SalesReport_Page() {
           </div>
 
           {/* REPORTE DEL DÍA */}
-          <div className="flex items-center gap-4 py-4">
+          <div className="flex items-center justify-center gap-4 py-4 w-full">
             <span className="text-2xl text-gray-800">Reporte del dia</span>
             <input 
               type="checkbox" 
@@ -101,8 +101,8 @@ export default function SalesReport_Page() {
           </div>
 
           {/* SELECCIÓN VENDEDOR */}
-          <div className="space-y-4">
-            <h3 className="text-2xl text-gray-800">Selecciona un vendedor</h3>
+          <div className="space-y-4 flex flex-col items-center w-full">
+            <h3 className="text-2xl text-gray-800 text-center">Selecciona un vendedor</h3>
             <select 
               className="w-64 p-2 border-2 border-gray-200 rounded-md outline-none focus:border-[#3ab0e2] bg-gray-50 cursor-pointer overflow-y-auto"
               value={vendedorSeleccionado}
@@ -115,7 +115,7 @@ export default function SalesReport_Page() {
           </div>
 
           {/* BOTÓN GENERAR */}
-          <div className="flex justify-end pt-10">
+          <div className="flex justify-center pt-10 w-full">
             <button
               onClick={handleGenerateReport}
               className="bg-[#3ab0e2] hover:bg-[#16A085] text-white px-8 py-3 rounded shadow-md transition-all flex items-center gap-3 font-medium active:scale-95 cursor-pointer"

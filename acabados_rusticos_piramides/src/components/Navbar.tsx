@@ -475,7 +475,7 @@ export default function Navbar({
         <div className="p-4 flex flex-col items-center gap-1 w-full">
           <SideItem label="Inventario" onClick={() => go(ROUTES.INVENTORY)} />
           <SideItem label="Productos" onClick={() => go(ROUTES.PRODUCTS.ROOT)} />
-          <SideItem label="Proveedores" onClick={() => go(ROUTES.SUPPLIERS)} />
+          <SideItem label="Proveedores" onClick={() => go(ROUTES.SUPPLIERS.ROOT)} />
           <SideItem label="Clientes" onClick={() => go(ROUTES.CLIENTS)} />
           <SideItem label="Descuentos" onClick={() => go(ROUTES.DISCOUNTS.ROOT)} />
           <SideItem label="Ventas y pedidos" onClick={() => go(ROUTES.SALES.ROOT)} />

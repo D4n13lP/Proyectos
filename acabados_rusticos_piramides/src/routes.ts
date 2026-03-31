@@ -1,6 +1,4 @@
   
-import ProductCatalog from "./views/ProductCatalog_Page";
-
 export const ROUTES = {
   LOGIN: "/login",
   DASHBOARD: "/",
@@ -13,6 +11,7 @@ export const ROUTES = {
   PRODUCTS: {
     ROOT: "/products",
     PRODUCT_CATALOG: "/products/catalog",
+    ADD_PRODUCT: "/products/add-product",
   },
 
   SUPPLIERS: {

@@ -4,6 +4,7 @@ import { ROUTES } from "./routes";
 
 import AccountDisplay_Page from './views/AccountDisplay_Page'
 import AddProducts_Page from './views/AddProducts_Page'
+import AddProduct_Page from './views/AddProduct_Page'
 import Clients_Page from './views/Clients_Page'
 import DashboardPage from './views/DashboardPage'
 import Deliverymen_Page from './views/Deliverymen_Page'
@@ -59,6 +60,7 @@ export default function AppRouter() {
           <Route path={ROUTES.ORDERS.REPORT} element={<OrdersReports_Page />} />
           <Route path={ROUTES.PRODUCTS.ROOT} element={<Products_Page />} />
           <Route path={ROUTES.PRODUCTS.PRODUCT_CATALOG} element={<ProductCatalog_Page />}/>
+          <Route path={ROUTES.PRODUCTS.ADD_PRODUCT} element={<AddProduct_Page />} />
           <Route path="orders/register" element={<RegisterOrder_Page />} />
           <Route path="products/register" element={<RegisterProducts_Page />} />
           <Route path="sales/register" element={<RegisterSale_Page />} />

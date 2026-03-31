@@ -1,9 +1,13 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ArrowLeft, Edit3, Trash2, Check, RotateCcw } from 'lucide-react'
+import ProductModal from '../components/ProductModal'
+import { useAppStore } from '../stores/useAppStore'
+import type { Product } from '../types'
 
 export default function SupplierDetail_Page() {
   const navigate = useNavigate()
+  const openModal = useAppStore((state) => state.openModal)
   
   // Estado para el modo edición
   const [isEditing, setIsEditing] = useState(false)
@@ -24,10 +28,23 @@ export default function SupplierDetail_Page() {
   // Simulación de productos asociados
   // Si este arreglo tiene datos, el botón eliminar mostrará la advertencia
   const [associatedProducts] = useState([
-    { id: 'MD45600789', nombre: 'Maceta Decorativa De conejo amarillo, rosa', categoria: 'Macetas' }
+    {
+      id: 'MD-45600789',
+      nombre: 'Maceta Decorativa De conejo amarillo, rosa',
+      categoria: 'Macetas',
+      precio: 249,
+      imagenes: [
+        'https://via.placeholder.com/600x600?text=Producto',
+      ],
+      descripcion: 'Producto asociado al proveedor. Datos simulados hasta conectar BD.'
+    }
   ])
 
   const hasProducts = associatedProducts.length > 0
+
+  const handleViewProduct = (product: Product) => {
+    openModal(product)
+  }
 
   const handleEliminar = () => {
     if (hasProducts) {
@@ -153,7 +170,10 @@ export default function SupplierDetail_Page() {
                   <td className="px-6 py-4">{prod.nombre}</td>
                   <td className="px-6 py-4 text-center">{prod.categoria}</td>
                   <td className="px-6 py-4 text-center">
-                    <button className="text-[#3ab0e2] hover:text-emerald-600 font-bold underline transition-colors cursor-pointer">
+                    <button
+                      onClick={() => handleViewProduct(prod)}
+                      className="text-[#3ab0e2] hover:text-emerald-600 font-bold underline transition-colors cursor-pointer"
+                    >
                       Ver producto
                     </button>
                   </td>
@@ -169,6 +189,8 @@ export default function SupplierDetail_Page() {
           </table>
         </div>
       </div>
+
+      <ProductModal />
     </div>
   )
 }

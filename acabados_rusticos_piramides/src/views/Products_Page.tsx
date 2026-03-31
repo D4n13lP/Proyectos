@@ -1,6 +1,7 @@
 import { Package, ClipboardCheck } from 'lucide-react';
 import MenuCard from '../components/MenuCard';
 import logoEmpresa from '../assets/logo_empresa.jpg'; // Importación arriba del componente
+import { ROUTES } from '../routes';
 
 export default function ProductsMenu_Page() {
   const LOGO_SRC = "/src/assets/logo_empresa.png"; 
@@ -47,7 +48,7 @@ export default function ProductsMenu_Page() {
           <MenuCard 
             label="Registrar productos" 
             icon={ClipboardCheck} 
-            path="/products/new" 
+            path={ROUTES.PRODUCTS.ADD_PRODUCT} 
             bgColor="bg-[#ffcc33]" 
           />
         </div>
