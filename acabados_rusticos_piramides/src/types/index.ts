@@ -1,4 +1,4 @@
-import { z } from "zod";
+﻿import { z } from "zod";
 
 // Esquema para una categoría individual
 export const CategorySchema = z.string();
@@ -10,7 +10,7 @@ export const CategoriesAPIResponseSchema = z.array(CategorySchema);
 export const ProductSchema = z.object({
   id: z.string(),
   nombre: z.string(),
-  imagenes: z.array(z.string()).max(5), // Cambiado a arreglo de hasta 5
+  imagenes: z.array(z.string()).max(10), // Cambiado a arreglo de hasta 10
   precio: z.number(),
   categoria: z.string(),
   descripcion: z.string().optional()

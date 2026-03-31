@@ -47,7 +47,7 @@ export default function AppRouter() {
           <Route index element={<DashboardPage />} />
 
           <Route path="account" element={<AccountDisplay_Page />} />
-          <Route path="products/add" element={<AddProducts_Page />} />
+          <Route path={ROUTES.PRODUCTS.ADD_PRODUCTS} element={<AddProducts_Page />} />
           <Route path={ROUTES.CLIENTS} element={<Clients_Page />} />
           <Route path="deliverymen" element={<Deliverymen_Page />} />
           <Route path={ROUTES.DISCOUNTS.ROOT} element={<Discounts_Page />} />

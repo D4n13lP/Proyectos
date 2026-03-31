@@ -48,7 +48,7 @@ export default function ProductsMenu_Page() {
           <MenuCard 
             label="Registrar productos" 
             icon={ClipboardCheck} 
-            path={ROUTES.PRODUCTS.ADD_PRODUCT} 
+            path={ROUTES.PRODUCTS.ADD_PRODUCTS} 
             bgColor="bg-[#ffcc33]" 
           />
         </div>

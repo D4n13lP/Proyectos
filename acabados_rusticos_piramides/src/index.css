@@ -85,6 +85,11 @@ button:focus-visible {
   background-color: #2A3542;
 }
 
+/* Ocultar la flecha por defecto de datalist en navegadores webkit */
+input[list]::-webkit-list-button, 
+input[list]::-webkit-calendar-picker-indicator {
+  display: none !important;
+}
 
 @theme {
   /* Definimos la animación */

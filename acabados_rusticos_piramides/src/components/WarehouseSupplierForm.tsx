@@ -1,7 +1,16 @@
-import { useState, useEffect } from 'react'
+﻿import { useState, useEffect } from 'react'
 
 interface WarehouseSupplierFormProps {
   onDataChange?: (data: any) => void
+  onNextTab?: () => void
+  onPrevTab?: () => void
+}
+
+interface AlmacenData {
+  id: string
+  nombre: string
+  direccion: string
+  descripcion: string
 }
 
 interface SupplierData {
@@ -12,20 +21,25 @@ interface SupplierData {
   telefonoOficina: string
   contacto: string
   telefonoContacto: string
-  correo: string
-  web: string
 }
 
-export default function WarehouseSupplierForm({ onDataChange }: WarehouseSupplierFormProps) {
-  // Estado para el dropdown de proveedores
-  const [suppliers, setSuppliers] = useState<SupplierData[]>([])
-  const [selectedSupplierId, setSelectedSupplierId] = useState('')
+export default function WarehouseSupplierForm({ onDataChange, onNextTab, onPrevTab }: WarehouseSupplierFormProps) {
+  const [step, setStep] = useState(1) // 1: Almacen, 2: Proveedor
+  
+  // Estado para la lista de almacenes (simulando BD)
+  const [almacenes, setAlmacenes] = useState<AlmacenData[]>([])
+  
+  // Estado para la lista de proveedores (simulando BD)
+  const [proveedores, setProveedores] = useState<SupplierData[]>([])
+
   const [isNewSupplier, setIsNewSupplier] = useState(false)
+  const [selectedSupplierId, setSelectedSupplierId] = useState('')
 
   // Estado del formulario
   const [formData, setFormData] = useState({
     nombreAlmacen: '',
-    direccion: '',
+    direccionAlmacen: '',
+    descripcionAlmacen: '',
     proveedor: {
       id: '',
       nombre: '',
@@ -33,327 +47,263 @@ export default function WarehouseSupplierForm({ onDataChange }: WarehouseSupplie
       direccion: '',
       telefonoOficina: '',
       contacto: '',
-      telefonoContacto: '',
-      correo: '',
-      web: ''
+      telefonoContacto: ''
     }
   })
 
-  // Cargar datos de proveedores desde la BD (simulado)
   useEffect(() => {
-    // TODO: Reemplazar con llamada a BD real cuando esté disponible
-    setSuppliers([
-      {
-        id: 'MD001',
-        nombre: 'proveedor1',
-        empresa: 'Macetas',
-        direccion: '742 Evergreen Terrace, Springfield, Aguascalientes, Mexico',
-        telefonoOficina: '55 1234 7777',
-        contacto: 'Juan',
-        telefonoContacto: '55 2222 1234',
-        correo: 'proveedor@gmail.com',
-        web: 'www.ventas.com.mx'
-      },
-      {
-        id: 'MD002',
-        nombre: 'proveedor2',
-        empresa: 'Adhesivos Plus',
-        direccion: 'Calle Principal 123, México',
-        telefonoOficina: '55 5555 5555',
-        contacto: 'Carlos',
-        telefonoContacto: '55 6666 6666',
-        correo: 'carlos@adhesivos.com',
-        web: 'www.adhesivos.com.mx'
-      }
+    setAlmacenes([
+      { id: '1', nombre: 'Matriz Coyoacán', direccion: 'Av. Miguel Ángel de Quevedo 123', descripcion: 'Bodega principal sur' },
+      { id: '2', nombre: 'Sucursal Polanco', direccion: 'Av. Homero 456', descripcion: 'Ventas corporativas' }
+    ])
+    setProveedores([
+      { id: 'PROV-001', nombre: 'Proveedor Uno', empresa: 'Empresa S.A.', direccion: 'Calle Falsa 123', telefonoOficina: '5555555555', contacto: 'Juan', telefonoContacto: '5555555555' },
+      { id: 'PROV-002', nombre: 'Proveedor Dos', empresa: 'Industrias B', direccion: 'Avenida 45', telefonoOficina: '4444444444', contacto: 'Maria', telefonoContacto: '4444444444' }
     ])
   }, [])
 
-  const handleSupplierSelect = (supplierId: string) => {
-    setSelectedSupplierId(supplierId)
-    
-    // Buscar el proveedor y llenar el formulario automáticamente
-    if (supplierId) {
-      const supplier = suppliers.find(s => s.id === supplierId)
-      if (supplier && !isNewSupplier) {
-        setFormData({
-          ...formData,
-          proveedor: supplier
-        })
-      }
-    }
-  }
-
-  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setIsNewSupplier(e.target.checked)
-    
-    if (e.target.checked) {
-      // Limpiar el formulario cuando se marca "Nuevo proveedor"
-      setFormData({
-        ...formData,
-        proveedor: {
-          id: '',
-          nombre: '',
-          empresa: '',
-          direccion: '',
-          telefonoOficina: '',
-          contacto: '',
-          telefonoContacto: '',
-          correo: '',
-          web: ''
-        }
-      })
-    } else {
-      // Si se desmarca, llenar con datos del proveedor seleccionado
-      if (selectedSupplierId) {
-        const supplier = suppliers.find(s => s.id === selectedSupplierId)
-        if (supplier) {
-          setFormData({
-            ...formData,
-            proveedor: supplier
-          })
-        }
-      }
-    }
-  }
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>, field: string) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, field: string, isProveedor = false) => {
     const { value } = e.target
     
-    if (field.startsWith('proveedor.')) {
-      const proveedorField = field.split('.')[1]
+    if (isProveedor) {
       const newData = {
         ...formData,
-        proveedor: {
-          ...formData.proveedor,
-          [proveedorField]: value
-        }
+        proveedor: { ...formData.proveedor, [field]: value }
       }
       setFormData(newData)
       if (onDataChange) onDataChange(newData)
     } else {
       const newData = { ...formData, [field]: value }
       setFormData(newData)
+      
+      if (field === 'nombreAlmacen') {
+        const selectedAlmacen = almacenes.find(a => a.nombre === value)
+        if (selectedAlmacen) {
+          newData.direccionAlmacen = selectedAlmacen.direccion || ''
+          newData.descripcionAlmacen = selectedAlmacen.descripcion || ''
+          setFormData(newData)
+        }
+      }
       if (onDataChange) onDataChange(newData)
     }
   }
 
+  const handleSupplierSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value
+    setSelectedSupplierId(value)
+    
+    if (value) {
+      const provider = proveedores.find(p => p.id === value)
+      if (provider && !isNewSupplier) {
+        const newData = { ...formData, proveedor: { ...provider } }
+        setFormData(newData)
+        if (onDataChange) onDataChange(newData)
+      }
+    } else {
+      const newData = { ...formData, proveedor: { id: '', nombre: '', empresa: '', direccion: '', telefonoOficina: '', contacto: '', telefonoContacto: '' } }
+      setFormData(newData)
+      if (onDataChange) onDataChange(newData)
+    }
+  }
+
+  const toggleNewSupplier = () => {
+    const newValue = !isNewSupplier
+    setIsNewSupplier(newValue)
+    if (newValue) {
+      // Limpiar y resetear select
+      setSelectedSupplierId('')
+      const newData = { ...formData, proveedor: { id: '', nombre: '', empresa: '', direccion: '', telefonoOficina: '', contacto: '', telefonoContacto: '' } }
+      setFormData(newData)
+      if (onDataChange) onDataChange(newData)
+    } else if (selectedSupplierId) {
+      const provider = proveedores.find(p => p.id === selectedSupplierId)
+      if (provider) {
+        const newData = { ...formData, proveedor: { ...provider } }
+        setFormData(newData)
+        if (onDataChange) onDataChange(newData)
+      }
+    }
+  }
+
+  const handleNext = () => {
+    if (step === 1) {
+      setStep(2)
+    } else {
+      if (onNextTab) onNextTab()
+    }
+  }
+
+  const handlePrev = () => {
+    if (step === 2) {
+      setStep(1)
+    } else {
+      if (onPrevTab) onPrevTab()
+    }
+  }
+
+  // Estilo base de los inputs usado en ProductDataForm
+  const inputClassName = "w-full px-3 py-2 border border-gray-300 rounded focus:border-[#3ab0e2] focus:outline-none placeholder-gray-400 text-sm font-medium bg-white text-gray-800"
+  
   return (
-    <div className="space-y-8">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">Datos del Almacén y Proveedor</h2>
+    <div className="w-full relative">
 
-      {/* SECCIÓN ALMACÉN */}
-      <div className="space-y-4 pb-8 border-b border-gray-200">
-        <h3 className="text-lg font-bold text-gray-700">Datos del Almacén</h3>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2 uppercase">
-              Nombre del almacén *
-            </label>
-            <select
-              value={formData.nombreAlmacen}
-              onChange={(e) => handleInputChange(e, 'nombreAlmacen')}
-              className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:border-emerald-400 focus:outline-none bg-white"
-            >
-              <option value="">Seleccionar almacén...</option>
-              <option value="Matriz Coyoacán">Matriz Coyoacán</option>
-              <option value="Sucursal Polanco">Sucursal Polanco</option>
-              <option value="Bodega Centro">Bodega Centro</option>
-            </select>
-            <small className="text-gray-400 block mt-1">Los datos se cargarán de la base de datos</small>
-          </div>
-
-          <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2 uppercase">
-              Dirección *
-            </label>
-            <input
-              type="text"
-              value={formData.direccion}
-              onChange={(e) => handleInputChange(e, 'direccion')}
-              placeholder="Ingrese la dirección del almacén"
-              className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:border-emerald-400 focus:outline-none"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* SECCIÓN PROVEEDOR */}
-      <div className="space-y-6">
-        <div className="flex items-center gap-4">
-          <h3 className="text-lg font-bold text-gray-700">Datos del Proveedor</h3>
-        </div>
-
-        {/* Checkbox Nuevo Proveedor */}
-        <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg border-2 border-gray-200">
-          <input
-            type="checkbox"
-            id="newSupplier"
-            checked={isNewSupplier}
-            onChange={handleCheckboxChange}
-            className="w-5 h-5 cursor-pointer accent-emerald-500"
-          />
-          <label htmlFor="newSupplier" className="text-sm font-bold text-gray-700 cursor-pointer uppercase">
-            Nuevo proveedor
-          </label>
-        </div>
-
-        {/* Dropdown para seleccionar proveedor existente */}
-        {!isNewSupplier && (
-          <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2 uppercase">
-              Seleccionar proveedor *
-            </label>
-            <select
-              value={selectedSupplierId}
-              onChange={(e) => handleSupplierSelect(e.target.value)}
-              className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:border-emerald-400 focus:outline-none bg-white"
-            >
-              <option value="">Seleccionar proveedor...</option>
-              {suppliers.map(supplier => (
-                <option key={supplier.id} value={supplier.id}>
-                  {supplier.nombre} - {supplier.empresa}
-                </option>
-              ))}
-            </select>
-            <small className="text-gray-400 block mt-1">Los datos se cargarán de la base de datos</small>
-          </div>
-        )}
-
-        {/* Formulario de proveedor */}
-        <div
-          className={`p-6 border-2 rounded-lg transition-all ${
-            isNewSupplier ? 'border-emerald-400 bg-white' : 'border-gray-200 bg-gray-50'
-          }`}
-        >
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2 uppercase">
-                Código de proveedor
-              </label>
+      {/* STEP 1: Datos de Almacén */}
+      {step === 1 && (
+        <div className="w-full flex justify-center py-6 px-4 md:px-16 animate-fade-in relative">
+          <div className="w-full max-w-4xl space-y-4">
+            {/* Nombre del almacen */}
+            <div className="relative">
               <input
-                type="text"
-                value={formData.proveedor.id}
-                onChange={(e) => handleInputChange(e, 'proveedor.id')}
-                placeholder="ID del proveedor"
-                disabled={!isNewSupplier}
-                className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg disabled:bg-gray-100 disabled:cursor-not-allowed focus:border-emerald-400 focus:outline-none"
+                list="almacenes-list"
+                value={formData.nombreAlmacen}
+                onChange={(e) => handleInputChange(e, 'nombreAlmacen')}
+                placeholder="Nombre del almacen"
+                className={`${inputClassName} pr-8 appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-list-button]:hidden`}
               />
+              <datalist id="almacenes-list">
+                {almacenes.map(almacen => (
+                  <option key={almacen.id} value={almacen.nombre} />
+                ))}
+              </datalist>
+              <div className="absolute top-1/2 right-3 -translate-y-1/2 pointer-events-none text-gray-500">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="m6 9 6 6 6-6"/>
+                </svg>
+              </div>
             </div>
 
+            {/* Dirección */}
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2 uppercase">
-                Nombre proveedor *
-              </label>
               <input
                 type="text"
-                value={formData.proveedor.nombre}
-                onChange={(e) => handleInputChange(e, 'proveedor.nombre')}
-                placeholder="Nombre del proveedor"
-                disabled={!isNewSupplier}
-                className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg disabled:bg-gray-100 disabled:cursor-not-allowed focus:border-emerald-400 focus:outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2 uppercase">
-                Empresa
-              </label>
-              <input
-                type="text"
-                value={formData.proveedor.empresa}
-                onChange={(e) => handleInputChange(e, 'proveedor.empresa')}
-                placeholder="Nombre de la empresa"
-                disabled={!isNewSupplier}
-                className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg disabled:bg-gray-100 disabled:cursor-not-allowed focus:border-emerald-400 focus:outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2 uppercase">
-                Dirección
-              </label>
-              <input
-                type="text"
-                value={formData.proveedor.direccion}
-                onChange={(e) => handleInputChange(e, 'proveedor.direccion')}
+                value={formData.direccionAlmacen}
+                onChange={(e) => handleInputChange(e, 'direccionAlmacen')}
                 placeholder="Dirección"
-                disabled={!isNewSupplier}
-                className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg disabled:bg-gray-100 disabled:cursor-not-allowed focus:border-emerald-400 focus:outline-none"
+                className={inputClassName}
               />
             </div>
 
+            {/* Descripción */}
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2 uppercase">
-                Teléfono oficina
-              </label>
-              <input
-                type="text"
-                value={formData.proveedor.telefonoOficina}
-                onChange={(e) => handleInputChange(e, 'proveedor.telefonoOficina')}
-                placeholder="Teléfono de oficina"
-                disabled={!isNewSupplier}
-                className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg disabled:bg-gray-100 disabled:cursor-not-allowed focus:border-emerald-400 focus:outline-none"
+              <textarea
+                value={formData.descripcionAlmacen}
+                onChange={(e) => handleInputChange(e, 'descripcionAlmacen')}
+                placeholder="Descripción"
+                rows={12}
+                className={`${inputClassName} resize-y min-h-[120px]`}
               />
             </div>
-
-            <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2 uppercase">
-                Nombre del contacto
-              </label>
-              <input
-                type="text"
-                value={formData.proveedor.contacto}
-                onChange={(e) => handleInputChange(e, 'proveedor.contacto')}
-                placeholder="Nombre del contacto"
-                disabled={!isNewSupplier}
-                className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg disabled:bg-gray-100 disabled:cursor-not-allowed focus:border-emerald-400 focus:outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2 uppercase">
-                Teléfono del contacto
-              </label>
-              <input
-                type="text"
-                value={formData.proveedor.telefonoContacto}
-                onChange={(e) => handleInputChange(e, 'proveedor.telefonoContacto')}
-                placeholder="Teléfono de contacto"
-                disabled={!isNewSupplier}
-                className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg disabled:bg-gray-100 disabled:cursor-not-allowed focus:border-emerald-400 focus:outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2 uppercase">
-                Correo electrónico
-              </label>
-              <input
-                type="email"
-                value={formData.proveedor.correo}
-                onChange={(e) => handleInputChange(e, 'proveedor.correo')}
-                placeholder="correo@ejemplo.com"
-                disabled={!isNewSupplier}
-                className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg disabled:bg-gray-100 disabled:cursor-not-allowed focus:border-emerald-400 focus:outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2 uppercase">
-                Sitio web
-              </label>
-              <input
-                type="text"
-                value={formData.proveedor.web}
-                onChange={(e) => handleInputChange(e, 'proveedor.web')}
-                placeholder="www.ejemplo.com"
-                disabled={!isNewSupplier}
-                className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg disabled:bg-gray-100 disabled:cursor-not-allowed focus:border-emerald-400 focus:outline-none"
-              />
+            
+            {/* Botones */}
+            <div className="mt-8 flex gap-4 justify-end pt-4">
+              <button
+                onClick={handlePrev}
+                className="bg-gray-400 hover:bg-gray-500 text-white py-2 px-8 text-sm transition-colors duration-300 cursor-pointer"
+              >
+                Anterior
+              </button>
+              <button
+                onClick={handleNext}
+                className="bg-[#3ab0e2] hover:bg-[#16A085] text-white py-2 px-8 text-sm transition-colors duration-300 cursor-pointer"
+              >
+                Siguiente
+              </button>
             </div>
           </div>
         </div>
-      </div>
+      )}
+
+      {/* STEP 2: Registrar Proveedor */}
+      {step === 2 && (
+        <div className="w-full py-8 md:px-16 animate-fade-in relative min-h-[500px]">
+          {/* Botón Atrás (Top Right) */}
+          <div className="absolute top-0 right-0 md:right-8 lg:right-16 mt-4">
+            <button
+              onClick={handlePrev}
+              className="bg-[#3ab0e2] hover:bg-[#16A085] text-white py-1.5 px-6 rounded-sm text-sm transition-colors duration-300 cursor-pointer"
+            >
+              Atras
+            </button>
+          </div>
+
+          <div className="w-full max-w-4xl mx-auto">
+            {/* Título central */}
+            <h2 className="text-[32px] text-[#e64a19] mb-8 text-center pt-2">
+              Registrar proveedor
+            </h2>
+
+            {/* Fila Dropdown */}
+            <div className="flex justify-center mb-12">
+              <div className="relative w-[300px]">
+                <select
+                  value={selectedSupplierId}
+                  onChange={handleSupplierSelect}
+                  disabled={isNewSupplier}
+                  className={`${inputClassName} pr-8 appearance-none select-none disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed`}
+                >
+                  <option value="">Seleccionar proveedor</option>
+                  {proveedores.map(p => (
+                    <option key={p.id} value={p.id}>{p.nombre}</option>
+                  ))}
+                </select>
+                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                </div>
+              </div>
+            </div>
+
+            {/* Formulario Principal (Grid) */}
+            <div className="grid grid-cols-[1fr_2fr] gap-x-12 gap-y-6 items-start">
+              {/* Columna Izquierda: Checkbox Nuevo Proveedor */}
+              <div className="flex items-center gap-4 justify-end mt-2">
+                <span className="font-bold text-gray-800 text-[15px]">Nuevo proveedor</span>
+                <input
+                  type="checkbox"
+                  checked={isNewSupplier}
+                  onChange={toggleNewSupplier}
+                  className="w-5 h-5 rounded border-gray-300 cursor-pointer accent-[#16A085]"
+                />
+              </div>
+
+              {/* Columna Derecha: Campos */}
+              <div className="flex flex-col gap-4">
+                {[
+                  { label: 'Código de proveedor', field: 'id' as const },
+                  { label: 'Nombre de proveedor', field: 'nombre' as const },
+                  { label: 'Empresa', field: 'empresa' as const },
+                  { label: 'Dirección', field: 'direccion' as const },
+                  { label: 'Teléfono oficina', field: 'telefonoOficina' as const },
+                  { label: 'Nombre del contacto', field: 'contacto' as const },
+                  { label: 'Teléfono de contacto', field: 'telefonoContacto' as const },
+                ].map((item) => (
+                    <div key={item.field} className="w-[300px]">
+                      <input
+                        type="text"
+                        placeholder={item.label}
+                        value={formData.proveedor[item.field]}
+                        onChange={(e) => handleInputChange(e, item.field, true)}
+                        disabled={!isNewSupplier && !selectedSupplierId}
+                        readOnly={!isNewSupplier}
+                        className={`${inputClassName} w-full disabled:bg-gray-100 disabled:text-gray-500 read-only:focus:border-gray-300`}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Botón Siguiente Abajo */}
+            <div className="flex justify-end mt-12 mb-4 pr-16 md:pr-[120px]">
+              <button
+                onClick={handleNext}
+                className="bg-[#3ab0e2] hover:bg-[#16A085] text-white py-2 px-8 text-sm transition-colors duration-300 cursor-pointer"
+              >
+                Siguiente
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   )
 }

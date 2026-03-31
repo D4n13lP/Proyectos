@@ -1,168 +1,317 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import * as React from 'react'
-import { UploadCloud } from 'lucide-react'
+import { X } from 'lucide-react'
 
 interface ProductDataFormProps {
   onDataChange?: (data: any) => void
 }
 
 export default function ProductDataForm({ onDataChange }: ProductDataFormProps) {
-  // Estados para los dropdowns - estos se llenarán con datos de BD
   const [categories, setCategories] = useState<string[]>([])
   const [currencies, setCurrencies] = useState<string[]>([])
   const [units, setUnits] = useState<string[]>([])
 
-  // Estados del formulario
   const [formData, setFormData] = useState({
+    codigo: '',
+    sku: '',
     nombre: '',
     categoria: '',
+    costo: '',
     moneda: '',
+    cantidad: '',
     unidades: '',
-    imagen: null as File | null,
-    imagenPreview: ''
+    unidadesStockBajo: '',
+    proveedor: '',
+    descripcion: '',
+    imagenes: [] as File[],
+    imagenesPrevisualizacion: [] as string[]
   })
 
-  // Simular carga de datos de BD (cambiar cuando conectes BD real)
   useEffect(() => {
-    // TODO: Reemplazar con llamada a BD real cuando esté disponible
+    // Simulando consulta a BD. Permite seleccionar una existente o escribir una nueva
     setCategories(['Macetas', 'Adhesivos', 'Adoquín', 'Cantera laminada', 'Figuras', 'Mármol', 'Fuentes', 'Laja'])
     setCurrencies(['MXN', 'USD', 'EUR'])
     setUnits(['Pieza', 'Metro', 'Kg', 'Litro', 'Caja'])
   }, [])
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     const newData = { ...formData, [name]: value }
     setFormData(newData)
     if (onDataChange) onDataChange(newData)
   }
 
-  const fileInputRef = React.useRef<HTMLInputElement>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file && file.type.startsWith('image/')) {
-      const reader = new FileReader()
-      reader.onload = (event) => {
+    if (e.target.files) {
+      const filesArray = Array.from(e.target.files)
+      
+      // Limitar a máximo 10 imágenes en total
+      const availableSlots = 10 - formData.imagenes.length
+      const filesToAdd = filesArray.slice(0, availableSlots)
+      
+      if (filesToAdd.length < filesArray.length) {
+        alert("Solo se permite un máximo de 10 imágenes por producto.")
+      }
+
+      const newImages = [...formData.imagenes, ...filesToAdd]
+      
+      const prevPromises = filesToAdd.map(file => {
+        return new Promise<string>((resolve) => {
+          const reader = new FileReader()
+          reader.onload = (event) => resolve(event.target?.result as string)
+          reader.readAsDataURL(file)
+        })
+      })
+
+      Promise.all(prevPromises).then(newPreviews => {
+        const updatedPreviews = [...formData.imagenesPrevisualizacion, ...newPreviews]
         const newData = {
           ...formData,
-          imagen: file,
-          imagenPreview: event.target?.result as string
+          imagenes: newImages,
+          imagenesPrevisualizacion: updatedPreviews
         }
         setFormData(newData)
         if (onDataChange) onDataChange(newData)
-      }
-      reader.readAsDataURL(file)
+        
+        // Limpiar el input file
+        if (fileInputRef.current) {
+          fileInputRef.current.value = ''
+        }
+      })
     }
   }
 
-  return (
-    <div className="space-y-8">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">Datos del Producto</h2>
+  const removeImage = (indexToRemove: number) => {
+    const updatedImages = formData.imagenes.filter((_, i) => i !== indexToRemove)
+    const updatedPreviews = formData.imagenesPrevisualizacion.filter((_, i) => i !== indexToRemove)
+    
+    const newData = {
+      ...formData,
+      imagenes: updatedImages,
+      imagenesPrevisualizacion: updatedPreviews
+    }
+    setFormData(newData)
+    if (onDataChange) onDataChange(newData)
+  }
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* SECCIÓN IZQUIERDA: Imagen */}
-        <div className="flex flex-col gap-4">
-          <div className="relative w-full aspect-square bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg overflow-hidden flex items-center justify-center group cursor-pointer hover:border-emerald-400 transition-colors">
-            {formData.imagenPreview ? (
-              <img src={formData.imagenPreview} alt="Preview" className="w-full h-full object-cover" />
-            ) : (
-              <div className="flex flex-col items-center justify-center gap-2 text-gray-400">
-                <UploadCloud size={40} />
-                <span className="text-sm font-medium">Seleccionar imagen</span>
+  return (
+    <div className="flex flex-col md:flex-row gap-8 py-2">
+      {/* Columna Izquierda: Imágenes */}
+      <div className="w-full md:w-[250px] flex-shrink-0 flex flex-col items-center">
+        {/* Imagen Principal */}
+        <div className="w-full aspect-square bg-[#e6e6e6] rounded border border-gray-300 flex items-center justify-center relative overflow-hidden group">
+          {formData.imagenesPrevisualizacion.length > 0 ? (
+            <img src={formData.imagenesPrevisualizacion[0]} alt="Principal" className="w-full h-full object-cover" />
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center opacity-40">
+              <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="#a0a0a0" strokeWidth="1">
+                <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" fill="#d0d0d0"/>
+                <path d="m3.3 7 8.7 5 8.7-5" />
+                <path d="M12 22V12" />
+                <rect x="7" y="6" width="10" height="12" rx="1" fill="white" stroke="#606060"/>
+                <path d="M9 10h6" stroke="#50c878" strokeWidth="2" strokeLinecap="round"/>
+                <path d="M9 14h4" stroke="#50c878" strokeWidth="2" strokeLinecap="round"/>
+              </svg>
+            </div>
+          )}
+          {formData.imagenesPrevisualizacion.length > 0 && (
+             <button 
+                onClick={(e) => { e.stopPropagation(); removeImage(0); }}
+                className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+              >
+                <X size={16} />
+              </button>
+          )}
+        </div>
+        
+        {/* Sub-imágenes (miniaturas) */}
+        {formData.imagenesPrevisualizacion.length > 1 && (
+          <div className="mt-3 flex gap-2 overflow-x-auto w-full pb-2 px-1 custom-scrollbar">
+            {formData.imagenesPrevisualizacion.slice(1).map((preview, idx) => (
+              <div key={idx + 1} className="w-12 h-12 flex-shrink-0 bg-gray-100 rounded border border-gray-300 relative group">
+                <img src={preview} alt={`Miniatura ${idx + 1}`} className="w-full h-full object-cover rounded" />
+                <button 
+                  onClick={() => removeImage(idx + 1)}
+                  className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <X size={10} />
+                </button>
               </div>
-            )}
+            ))}
+          </div>
+        )}
+
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          multiple
+          onChange={handleImageUpload}
+          className="hidden"
+        />
+        <button
+          onClick={() => fileInputRef.current?.click()}
+          disabled={formData.imagenes.length >= 10}
+          className={`mt-4 bg-[#3ab0e2] hover:bg-[#16A085] text-white py-2 px-4 rounded text-sm transition-colors duration-300 w-full font-medium ${formData.imagenes.length >= 10 ? 'opacity-50 cursor-not-allowed' : ''}`}
+        >
+          Seleccionar archivo(s)
+        </button>
+        <span className="text-xs text-gray-400 mt-2">
+          {formData.imagenes.length} / 10 imágenes
+        </span>
+      </div>
+
+      {/* Columna Derecha: Formulario */}
+      <div className="flex-1 w-full">
+        {/* Datalists para autocompletado nativo */}
+        <datalist id="categoriesList">
+          {categories.map(c => <option key={c} value={c} />)}
+        </datalist>
+        <datalist id="currenciesList">
+          {currencies.map(c => <option key={c} value={c} />)}
+        </datalist>
+        <datalist id="unitsList">
+          {units.map(u => <option key={u} value={u} />)}
+        </datalist>
+
+        <div className="grid grid-cols-12 gap-y-5 gap-x-4">
+          {/* Fila 1 */}
+          <div className="col-span-12 sm:col-span-3">
             <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handleImageUpload}
-              className="absolute inset-0 opacity-0 cursor-pointer"
+              type="text"
+              name="codigo"
+              value={formData.codigo}
+              onChange={handleInputChange}
+              placeholder="Código"
+              className="w-full px-3 py-2 border border-gray-300 rounded focus:border-[#3ab0e2] focus:outline-none placeholder-gray-400 text-sm font-medium"
             />
           </div>
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            className="bg-[#3ab0e2] hover:bg-[#16A085] text-white py-2 px-4 rounded-lg font-bold text-sm uppercase cursor-pointer transition-all"
-          >
-            Seleccionar archivo
-          </button>
-        </div>
-
-        {/* SECCIÓN DERECHA: Formulario */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Nombre del producto */}
-          <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2 uppercase">
-              Nombre del producto *
-            </label>
+          <div className="col-span-12 sm:col-span-3">
+            <input
+              type="text"
+              name="sku"
+              value={formData.sku}
+              onChange={handleInputChange}
+              placeholder="SKU"
+              className="w-full px-3 py-2 border border-gray-300 rounded focus:border-[#3ab0e2] focus:outline-none placeholder-gray-400 text-sm font-medium"
+            />
+          </div>
+          <div className="col-span-12 sm:col-span-6">
             <input
               type="text"
               name="nombre"
               value={formData.nombre}
               onChange={handleInputChange}
-              placeholder="Ingrese el nombre del producto"
-              className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:border-emerald-400 focus:outline-none"
+              placeholder="Nombre producto"
+              className="w-full px-3 py-2 border border-gray-300 rounded focus:border-[#3ab0e2] focus:outline-none placeholder-gray-400 text-sm font-medium"
             />
           </div>
 
-          {/* Categoría */}
-          <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2 uppercase">
-              Categoría *
-            </label>
-            <select
-              name="categoria"
-              value={formData.categoria}
+          {/* Fila 2 */}
+          <div className="col-span-12 sm:col-span-4 lg:col-span-3">
+            <div className="relative">
+              <input
+                list="categoriesList"
+                name="categoria"
+                value={formData.categoria}
+                onChange={handleInputChange}
+                placeholder="Categoría"
+                className="w-full px-3 py-2 border border-gray-300 rounded focus:border-[#3ab0e2] focus:outline-none placeholder-gray-400 text-sm font-medium pr-8 appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-list-button]:hidden"
+              />
+              <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+              </div>
+            </div>
+          </div>
+          <div className="col-span-12 sm:col-span-4 lg:col-span-3">
+            <input
+              type="text"
+              name="costo"
+              value={formData.costo}
               onChange={handleInputChange}
-              className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:border-emerald-400 focus:outline-none bg-white"
-            >
-              <option value="">Seleccionar categoría...</option>
-              {categories.map(cat => (
-                <option key={cat} value={cat}>{cat}</option>
-              ))}
-            </select>
-            <small className="text-gray-400 block mt-1">Los datos se cargarán de la base de datos</small>
+              placeholder="Costo"
+              className="w-full px-3 py-2 border border-gray-300 rounded focus:border-[#3ab0e2] focus:outline-none placeholder-gray-400 text-sm font-medium"
+            />
+          </div>
+          <div className="col-span-12 sm:col-span-4 lg:col-span-3">
+            <div className="relative">
+              <input
+                list="currenciesList"
+                name="moneda"
+                value={formData.moneda}
+                onChange={handleInputChange}
+                placeholder="Moneda"
+                className="w-full px-3 py-2 border border-gray-300 rounded focus:border-[#3ab0e2] focus:outline-none placeholder-gray-400 text-sm font-medium pr-8 appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-list-button]:hidden"
+              />
+              <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+              </div>
+            </div>
+          </div>
+          <div className="col-span-12 lg:col-span-3">
+            <input
+              type="text"
+              name="cantidad"
+              value={formData.cantidad}
+              onChange={handleInputChange}
+              placeholder="Cantidad"
+              className="w-full px-3 py-2 border border-gray-300 rounded focus:border-[#3ab0e2] focus:outline-none placeholder-gray-400 text-sm font-medium"
+            />
           </div>
 
-          {/* Moneda */}
-          <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2 uppercase">
-              Moneda *
-            </label>
-            <select
-              name="moneda"
-              value={formData.moneda}
+          {/* Fila 3 */}
+          <div className="col-span-12 sm:col-span-4">
+             <div className="relative">
+              <input
+                list="unitsList"
+                name="unidades"
+                value={formData.unidades}
+                onChange={handleInputChange}
+                placeholder="Unidades"
+                className="w-full px-3 py-2 border border-gray-300 rounded focus:border-[#3ab0e2] focus:outline-none placeholder-gray-400 text-sm font-medium pr-8 appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-list-button]:hidden"
+              />
+              <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+              </div>
+            </div>
+          </div>
+          <div className="col-span-12 sm:col-span-4">
+            <input
+              type="text"
+              name="unidadesStockBajo"
+              value={formData.unidadesStockBajo}
               onChange={handleInputChange}
-              className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:border-emerald-400 focus:outline-none bg-white"
-            >
-              <option value="">Seleccionar moneda...</option>
-              {currencies.map(curr => (
-                <option key={curr} value={curr}>{curr}</option>
-              ))}
-            </select>
-            <small className="text-gray-400 block mt-1">Los datos se cargarán de la base de datos</small>
+              placeholder="Unidades de stock bajo"
+              className="w-full px-3 py-2 border border-gray-300 rounded focus:border-[#3ab0e2] focus:outline-none placeholder-gray-400 text-sm font-medium"
+            />
+          </div>
+          <div className="col-span-12 sm:col-span-4">
+            <input
+              type="text"
+              name="proveedor"
+              value={formData.proveedor}
+              onChange={handleInputChange}
+              placeholder="Proveedor"
+              className="w-full px-3 py-2 border border-gray-300 rounded focus:border-[#3ab0e2] focus:outline-none placeholder-gray-400 text-sm font-medium"
+            />
           </div>
 
-          {/* Unidades */}
-          <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2 uppercase">
-              Unidades *
-            </label>
-            <select
-              name="unidades"
-              value={formData.unidades}
+          {/* Fila 4: Descripción */}
+          <div className="col-span-12">
+            <textarea
+              name="descripcion"
+              value={formData.descripcion}
               onChange={handleInputChange}
-              className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:border-emerald-400 focus:outline-none bg-white"
-            >
-              <option value="">Seleccionar unidades...</option>
-              {units.map(unit => (
-                <option key={unit} value={unit}>{unit}</option>
-              ))}
-            </select>
-            <small className="text-gray-400 block mt-1">Los datos se cargarán de la base de datos</small>
+              placeholder="Descripción"
+              rows={6}
+              className="w-full px-3 py-2 border border-gray-300 rounded focus:border-[#3ab0e2] focus:outline-none placeholder-gray-400 text-sm font-medium resize-none"
+            />
           </div>
         </div>
       </div>
     </div>
   )
 }
+
