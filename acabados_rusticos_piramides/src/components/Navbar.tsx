@@ -259,7 +259,7 @@ import { useEffect, useRef, useState } from "react";
 import menuIcon from "../assets/icons/menu.png";
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { ROUTES } from "../routes";
-
+import { useAppStore } from "../stores/useAppStore";
 type NavHandler = (path: string) => void;
 
 type NavbarProps = {
@@ -281,6 +281,8 @@ export default function Navbar({
 }: NavbarProps) {
   const routerNavigate = useNavigate();
   const navigate: NavHandler = onNavigate ?? routerNavigate;
+  
+  const user = useAppStore(state => state.user);
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [salesOpen, setSalesOpen] = useState(false);
@@ -395,10 +397,10 @@ export default function Navbar({
               onClick={toggleProfile}
               className="h-10 w-10 rounded-full overflow-hidden ring-2 ring-white/10 hover:ring-white/25 transition cursor-pointer z-[60]"
             >
-              <img 
-                src={avatarSrc || DEFAULT_AVATAR} 
-                alt="Perfil" 
-                className="h-full w-full object-cover" 
+              <img
+                src={user?.avatarUrl || avatarSrc || DEFAULT_AVATAR}
+                alt="Perfil"
+                className="h-full w-full object-cover"
               />
             </button>
 
@@ -407,15 +409,15 @@ export default function Navbar({
               <div className="absolute top-12 right-0 w-72 mt-2 bg-[#2D3748] rounded-2xl shadow-2xl border border-white/10 z-[60] overflow-hidden origin-top-right transition-all transform animate-in zoom-in-95 duration-200 text-center">
                 <div className="p-6 flex flex-col items-center">
                   <div className="h-24 w-24 rounded-full overflow-hidden ring-1 ring-white/20 mb-4">
-                    <img 
-                      src={avatarSrc || DEFAULT_AVATAR} 
-                      alt="Usuario" 
-                      className="h-full w-full object-cover" 
+                    <img
+                      src={user?.avatarUrl || avatarSrc || DEFAULT_AVATAR}
+                      alt="Usuario"
+                      className="h-full w-full object-cover"
                     />
                   </div>
                   
                   <h3 className="text-white text-3xl font-light mb-6">
-                    ¡Hola, <span className="font-normal">César</span>!
+                    ¡Hola, <span className="font-normal">{user?.nombreUsuario?.split(' ')[0] || "César"}</span>!        
                   </h3>
 
                   <div className="w-full space-y-4">

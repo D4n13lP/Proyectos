@@ -7,25 +7,21 @@ export default function ProductsMenu_Page() {
   const LOGO_SRC = "/src/assets/logo_empresa.png"; 
 
   return (
-    <div className="min-h-screen bg-white p-6 md:p-10 animate-fade-in flex flex-col">
+    <div className="min-h-screen bg-white p-6 md:p-10 animate-fade-in flex flex-col items-center">
       
-      {/* 1. LOGO */}
-      <div className="max-w-7xl mx-auto w-full">
-        <img 
-          src={logoEmpresa} 
-          alt="LogoEmpresa" 
-          className="h-16 md:h-20 object-contain" 
-        />
-      </div>
-
-      {/* 2. CONTENEDOR DE CONTENIDO */}
-      <main className="flex-grow flex flex-col items-center">
+      {/* Header */}
+      <div className="w-full max-w-7xl mb-12 border-b border-gray-200 pb-8 relative flex items-center justify-center min-h-[5rem]">
+        {/* Logo a la izquierda */}
+        <div className="absolute left-0 top-1/2 -translate-y-1/2">
+          <img 
+            src={logoEmpresa} 
+            alt="LogoEmpresa" 
+            className="h-20 w-auto object-contain" 
+          />
+        </div>
         
-        {/* Espaciador mínimo arriba: Esto acerca el título al logo */}
-        <div className="h-2 md:h-4" />
-
-        {/* TITULO: Con un margen inferior (mb-32) mucho más grande para empujar las tarjetas */}
-        <div className="flex items-center gap-4 mb-32 text-[#e65100]">
+        {/* Título centrado */}
+        <div className="flex items-center gap-4 text-[#e65100]">
           <h1 className="text-4xl md:text-5xl font-normal tracking-tight">
             Productos
           </h1>
@@ -35,7 +31,11 @@ export default function ProductsMenu_Page() {
             <path d="M8 6h8M8 10h8" />
           </svg>
         </div>
+      </div>
 
+      {/* 2. CONTENEDOR DE CONTENIDO */}
+      <main className="flex-grow flex flex-col items-center w-full mt-10">
+        
         {/* 3. ÁREA DE TARJETAS: Ahora tienen más separación del título */}
         <div className="flex flex-wrap justify-center gap-20 w-full max-w-5xl px-4">
           <MenuCard 

@@ -304,20 +304,23 @@ export default function ClientsPage() {
   const displayedClientes = filteredClientes.slice(0, visibleCount);
 
   return (
-    <div className="min-h-screen bg-white p-6 md:p-10 animate-fade-in flex flex-col">
-      
-      {/* 1. LOGO */}
-      <div className="max-w-7xl mx-auto w-full mb-4">
-        <img src={logoEmpresa} alt="Logo" className="h-16 md:h-20 object-contain" />
-      </div>
-
-      <main className="w-full max-w-7xl mx-auto flex flex-col">
-        
-        {/* 2. TÍTULO ALTO */}
-        <div className="flex justify-center items-center gap-4 mb-10 text-[#e65100]">
-          <h1 className="text-5xl font-normal tracking-tight">Clientes</h1>
+    <div className="min-h-screen bg-white flex flex-col font-sans animate-fade-in">
+      {/* HEADER: Divider line at bottom */}
+      <header className="relative py-6 mb-8 border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-center items-center h-16">
+          <img
+            src={logoEmpresa}
+            alt="Logo Empresa"
+            className="absolute left-4 sm:left-6 lg:left-8 h-16 md:h-20 object-contain"
+          />
+          <h1 className="text-4xl md:text-5xl font-normal text-[#e65100] tracking-tight text-center">
+            Clientes
+          </h1>
         </div>
+      </header>
 
+      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col mb-10">
+        
         {/* 3. FORMULARIO DINÁMICO (5 CAMPOS + BOTÓN CAMALEÓN) */}
         <div className={`flex flex-wrap items-end gap-4 mb-8 p-6 rounded-lg border shadow-sm transition-all duration-300 ${isEditing ? 'bg-amber-50 border-amber-200' : 'bg-gray-50 border-gray-100'}`}>
           {[

@@ -16,15 +16,20 @@ interface SaleSummaryProps {
 }
 
 // Componente para los dropdowns personalizados (como en la imagen: botón verde + menú gris)
-export function CustomSelect({ label, options, value, onChange }: { label: string, options: string[], value: string, onChange: (v: string) => void }) {
+export function CustomSelect({ label, options, value, onChange, disabled = false }: { label: string, options: string[], value: string, onChange: (v: string) => void, disabled?: boolean }) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
     <div className="relative w-56">
       <button
         type="button"
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-full bg-[#1b9a82] hover:bg-[#157f6b] text-white py-2 px-4 rounded-md flex justify-between items-center text-sm font-medium transition-colors"
+        disabled={disabled}
+        onClick={() => !disabled && setIsOpen(!isOpen)}
+        className={`w-full py-2 px-4 rounded-md flex justify-between items-center text-sm font-medium transition-colors ${
+          disabled 
+            ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
+            : 'bg-[#1b9a82] hover:bg-[#157f6b] text-white'
+        }`}
       >
         <span>{value || label}</span>
         {isOpen ? <ChevronUp className="w-4 h-4 ml-2" /> : <ChevronDown className="w-4 h-4 ml-2" />}
@@ -132,7 +137,7 @@ export default function SaleSummary({ cartItems, onNext, variant = 'sale' }: Sal
         repartidor,
         costoEnvio: costoEnvioNum
       },
-      pago: { formaPago, cuentaDestino },
+      pago: { formaPago, cuentaDestino: formaPago === 'Efectivo' ? '' : cuentaDestino },
       totales: { base: totalFinal, conDescuento: totalConDescuento, final: totalConEnvio }
     });
   };
@@ -316,8 +321,9 @@ export default function SaleSummary({ cartItems, onNext, variant = 'sale' }: Sal
                   <CustomSelect 
                     label="Seleccionar cuenta" 
                     options={cuentasDestinoMock} 
-                    value={cuentaDestino} 
+                    value={formaPago === 'Efectivo' ? '' : cuentaDestino} 
                     onChange={setCuentaDestino} 
+                    disabled={formaPago === 'Efectivo'}
                   />
                 </div>
               </div>

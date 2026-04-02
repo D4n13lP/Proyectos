@@ -133,8 +133,9 @@ export default function OrderReview({ orderData, onRegister }: OrderReviewProps)
                 <CustomSelect 
                   label="Seleccionar cuenta" 
                   options={cuentasDestinoMock} 
-                  value={cuentaDestino} 
+                  value={formaPago === 'Efectivo' ? '' : cuentaDestino} 
                   onChange={setCuentaDestino} 
+                  disabled={formaPago === 'Efectivo'}
                 />
               </div>
           </div>

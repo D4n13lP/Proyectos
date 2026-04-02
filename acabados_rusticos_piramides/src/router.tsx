@@ -28,6 +28,7 @@ import Suppliers_Page from './views/Suppliers_Page'
 import SupplierDetail_Page from './views/SupplierDetail_Page';
 import UpdateOrder_Page from './views/UpdateOrder_Page'
 import WatchProducts_Page from './views/WatchProducts_Page'
+import Retiros_Page from './views/Retiros_Page'
 import Inventory_Page from './views/Inventory_Page';
 import ProductCatalog_Page from './views/ProductCatalog_Page';
 
@@ -47,6 +48,7 @@ export default function AppRouter() {
           <Route index element={<DashboardPage />} />
 
           <Route path="account" element={<AccountDisplay_Page />} />
+          <Route path="retiros" element={<Retiros_Page />} />
           <Route path={ROUTES.PRODUCTS.ADD_PRODUCTS} element={<AddProducts_Page />} />
           <Route path={ROUTES.CLIENTS} element={<Clients_Page />} />
           <Route path="deliverymen" element={<Deliverymen_Page />} />

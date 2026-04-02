@@ -42,29 +42,27 @@ export default function SalesReport_Page() {
   };
 
   return (
-    <div className="min-h-screen bg-white p-6 md:p-10 animate-fade-in flex flex-col">
-      <div className="max-w-7xl mx-auto w-full mb-4">
-        <img src={logoEmpresa} alt="Logo" className="h-16 md:h-20 object-contain" />
-      </div>
-
-      <main className="w-full max-w-4xl mx-auto flex flex-col items-center">
-        {/* BOTÓN REGRESAR */}
-        {/* <button 
-          onClick={() => navigate(-1)} 
-          className="flex items-center gap-2 text-gray-400 hover:text-[#3ab0e2] transition-colors mb-6 group cursor-pointer"
-        >
-          <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
-          <span>Regresar</span>
-        </button> */}
-
-        {/* TÍTULO CON ICONO A LA DERECHA */}
-        <div className="flex items-center justify-center gap-6 mb-12 w-full">
-          <h1 className="text-4xl md:text-5xl font-normal text-[#e65100]">Reporte de ventas</h1>
-          <TrendingUp className="text-[#e65100]" size={60} strokeWidth={1.5} />
+    <div className="min-h-screen bg-white flex flex-col font-sans animate-fade-in">
+      {/* HEADER: Divider line at bottom */}
+      <header className="relative py-6 mb-8 border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-center items-center h-16">
+          <img
+            src={logoEmpresa}
+            alt="Logo"
+            className="absolute left-4 sm:left-6 lg:left-8 h-16 md:h-20 object-contain"
+          />
+          <div className="flex items-center gap-4 text-[#e65100]">
+            <h1 className="text-4xl md:text-5xl font-normal tracking-tight text-center">
+              Reporte de ventas
+            </h1>
+            <TrendingUp size={48} strokeWidth={1.2} />
+          </div>
         </div>
+      </header>
 
+      <main className="flex-1 w-full max-w-4xl mx-auto flex flex-col items-center mb-10">
         <div className="space-y-12 w-full flex flex-col items-center">
-          <h2 className="text-2xl text-gray-700 font-light text-center">Selecciona una periodo para generar reporte</h2>
+          <h2 className="text-2xl text-gray-700 font-light text-center mt-6">Selecciona una periodo para generar reporte</h2>
 
           {/* SECCIÓN DE FECHAS */}
           <div className="space-y-6 w-full flex flex-col items-center">

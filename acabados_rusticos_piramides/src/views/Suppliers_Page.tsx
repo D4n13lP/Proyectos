@@ -4,33 +4,33 @@ import logoEmpresa from '../assets/logo_empresa.jpg'; // Usando la importación 
 
 export default function SuppliersMenu_Page() {
   return (
-    <div className="min-h-screen bg-white p-6 md:p-10 animate-fade-in flex flex-col">
+    <div className="min-h-screen bg-white p-6 md:p-10 animate-fade-in flex flex-col items-center">
       
-      {/* 1. LOGO: Posicionado arriba a la izquierda */}
-      <div className="max-w-7xl mx-auto w-full">
-        <img 
-          src={logoEmpresa} 
-          alt="Acabados Rústicos Pirámides" 
-          className="h-16 md:h-20 object-contain" 
-        />
-      </div>
-
-      <main className="flex-grow flex flex-col items-center">
+      {/* Header */}
+      <div className="w-full max-w-7xl mb-12 border-b border-gray-200 pb-8 relative flex items-center justify-center min-h-[5rem]">
+        {/* Logo a la izquierda */}
+        <div className="absolute left-0 top-1/2 -translate-y-1/2">
+          <img 
+            src={logoEmpresa} 
+            alt="Acabados Rústicos Pirámides" 
+            className="h-20 w-auto object-contain" 
+          />
+        </div>
         
-        {/* Espaciador mínimo para subir el título */}
-        <div className="h-2 md:h-4" />
-
-        {/* 2. TÍTULO: "Proveedores" con el margen inferior estándar de mb-32 */}
-        <div className="flex items-center gap-6 mb-32 text-[#e65100]">
+        {/* Título centrado */}
+        <div className="flex items-center gap-6 text-[#e65100]">
           <h1 className="text-4xl md:text-5xl font-normal tracking-tight">
             Proveedores
           </h1>
           {/* Icono de Proveedores similar al de la imagen */}
-          <div className="text-[#e65100]">
+          <div className="text-inherit">
             <Users size={55} strokeWidth={1.5} />
           </div>
         </div>
+      </div>
 
+      <main className="flex-grow flex flex-col items-center w-full mt-10">
+        
         {/* 3. GRID DE TARJETAS: Con separación gap-20 y efecto hover invertido */}
         <div className="flex flex-wrap justify-center gap-20 w-full max-w-5xl px-4">
           

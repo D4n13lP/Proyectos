@@ -22,19 +22,25 @@ export default function DiscountsMenu_Page() {
   };
 
   return (
-    <div className="min-h-screen bg-white p-6 md:p-10 animate-fade-in flex flex-col">
-      <div className="max-w-7xl mx-auto w-full mb-4">
-        <img src={logoEmpresa} alt="Logo" className="h-16 md:h-20 object-contain" />
-      </div>
+    <div className="min-h-screen bg-white flex flex-col font-sans animate-fade-in">
+      {/* HEADER: Divider line at bottom */}
+      <header className="relative py-6 mb-8 border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-center items-center h-16">
+          <img
+            src={logoEmpresa}
+            alt="Logo Empresa"
+            className="absolute left-4 sm:left-6 lg:left-8 h-16 md:h-20 object-contain"
+          />
+          <div className="flex items-center gap-4 text-[#e65100]">
+            <h1 className="text-4xl md:text-5xl font-normal tracking-tight text-center">
+              Descuentos
+            </h1>
+            <TicketPercent size={48} strokeWidth={1.2} />
+          </div>
+        </div>
+      </header>
 
       <main className="flex-grow flex flex-col items-center">
-        <div className="h-2 md:h-4" />
-
-        <div className="flex items-center gap-6 mb-16 text-[#e65100]">
-          <h1 className="text-4xl md:text-5xl font-normal tracking-tight">Descuentos</h1>
-          <TicketPercent className="text-[#e65100]" size={70} strokeWidth={1.2} />
-        </div>
-
         <div className="w-full max-w-md flex flex-col items-center">
           <h2 className="text-xl text-gray-800 mb-12 font-medium">Selecciona el tipo de descuento</h2>
 
