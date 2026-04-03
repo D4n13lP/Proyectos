@@ -244,9 +244,12 @@
 // }
 
 import { Search, ChevronUp, ChevronDown } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../stores/useAppStore';
+import { ROUTES } from '../routes';
 
 export default function Inventory() {
+  const navigate = useNavigate();
   const { tabActiva, setTabActiva, filtros, setFiltro, productos } = useAppStore();
 
   const tabs = [
@@ -256,14 +259,39 @@ export default function Inventory() {
     { id: 'transferencias', label: 'Historial de transferencias' },
   ];
 
-  const columnas = [
-    { label: 'Producto', key: 'nombre' },
-    { label: 'Categoría', key: 'categoria' },
-    { label: 'Cantidad disponible', key: 'stock' },
-    { label: 'Pendientes de entregar', key: 'pendientes' },
-    { label: 'Estado', key: 'estado' },
-    { label: 'Opciones', key: 'opciones' },
-  ];
+  const getColumnas = () => {
+    if (tabActiva === 'ajustes') {
+      return [
+        { label: 'Producto', key: 'producto' },
+        { label: 'Categoría', key: 'categoria' },
+        { label: 'Cantidad disponible', key: 'cantidadDisponible' },
+        { label: 'C. Disponible antes', key: 'cDisponibleAntes' },
+        { label: 'Pendientes de entrega', key: 'pendientesEntrega' },
+        { label: 'P. De entregar antes', key: 'pEntregarAntes' },
+        { label: 'Fecha de ajuste', key: 'fechaAjuste' },
+      ];
+    } else if (tabActiva === 'transferencias') {
+      return [
+        { label: 'Producto', key: 'producto' },
+        { label: 'Categoría', key: 'categoria' },
+        { label: 'Almacen de origen', key: 'almacenOrigen' },
+        { label: 'Almacen destino', key: 'almacenDestino' },
+        { label: 'Cantidad', key: 'cantidad' },
+        { label: 'Fecha de transferencia', key: 'fechaTransferencia' },
+      ];
+    } else {
+      return [
+        { label: 'Producto', key: 'nombre' },
+        { label: 'Categoría', key: 'categoria' },
+        { label: 'Cantidad disponible', key: 'stock' },
+        { label: 'Pendientes de entregar', key: 'pendientes' },
+        { label: 'Estado', key: 'estado' },
+        { label: 'Opciones', key: 'opciones' },
+      ];
+    }
+  };
+
+  const columnas = getColumnas();
 
   return (
     <div className="min-h-screen bg-gray-100 p-4 md:p-8 font-sans">
@@ -273,7 +301,10 @@ export default function Inventory() {
           <h1 className="text-4xl font-bold text-[#e65100]">Inventario</h1>
           <h2 className="text-2xl font-normal text-gray-600">General</h2>
         </div>
-        <button className="bg-[#3ab0e2] text-white px-6 py-1.5 rounded text-sm font-medium hover:bg-sky-600 transition shadow-sm">
+        <button 
+          onClick={() => navigate(ROUTES.DELIVERYMEN)}
+          className="bg-[#3ab0e2] text-white px-6 py-1.5 rounded text-sm font-medium hover:bg-sky-600 transition shadow-sm cursor-pointer"
+        >
           Repartidores
         </button>
       </div>
@@ -347,7 +378,7 @@ export default function Inventory() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                {productos.length > 0 ? (
+                {(productos.length > 0 && (tabActiva === 'general' || tabActiva === 'almacen')) ? (
                   // RENDERIZADO DINÁMICO: Se crean tantas filas como objetos haya en 'productos'
                   productos.map((prod) => (
                     <tr key={prod.id} className="hover:bg-gray-50 transition-colors h-11">
@@ -363,10 +394,10 @@ export default function Inventory() {
                   ))
                 ) : (
                   // MOCK VISUAL: Solo se muestra si el array está vacío (Estado inicial)
-                  Array(50).fill(0).map((_, i) => (
+                  Array(5).fill(0).map((_, i) => (
                     <tr key={`empty-${i}`} className="h-11">
                       {columnas.map((_, j) => (
-                        <td key={`cell-${j}`} className="border-r border-gray-100 last:border-r-0"></td>
+                        <td key={`cell-${j}`} className="border-r border-gray-300 last:border-r-0"></td>
                       ))}
                     </tr>
                   ))

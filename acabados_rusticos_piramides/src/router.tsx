@@ -9,6 +9,7 @@ import Clients_Page from './views/Clients_Page'
 import DashboardPage from './views/DashboardPage'
 import Deliverymen_Page from './views/Deliverymen_Page'
 import Discounts_Page from './views/Discounts_Page'
+import ClientHistory_Page from './views/ClientHistory_Page'
 import PromotionSetupPage from './views/PromotionSetupPage'
 import ClientsDiscountPage from './views/ClientsDiscountPage'
 import DiscountAdjustmentPage from './views/DiscountAdjustmentPage'
@@ -26,7 +27,10 @@ import Sales_and_orders_Page from './views/Sales_and_orders_Page'
 import SalesReport_Page from './views/SalesReport_Page'
 import Suppliers_Page from './views/Suppliers_Page'
 import SupplierDetail_Page from './views/SupplierDetail_Page';
+import WatchSuppliers_Page from './views/WatchSuppliers_Page';
+import RegisterSupplier_Page from './views/RegisterSupplier_Page';
 import UpdateOrder_Page from './views/UpdateOrder_Page'
+import OrderDetail_Page from './views/OrderDetail_Page'
 import WatchProducts_Page from './views/WatchProducts_Page'
 import Retiros_Page from './views/Retiros_Page'
 import Inventory_Page from './views/Inventory_Page';
@@ -51,7 +55,8 @@ export default function AppRouter() {
           <Route path="retiros" element={<Retiros_Page />} />
           <Route path={ROUTES.PRODUCTS.ADD_PRODUCTS} element={<AddProducts_Page />} />
           <Route path={ROUTES.CLIENTS} element={<Clients_Page />} />
-          <Route path="deliverymen" element={<Deliverymen_Page />} />
+          <Route path="/clients/history/:id" element={<ClientHistory_Page />} />
+          <Route path={ROUTES.DELIVERYMEN} element={<Deliverymen_Page />} />
           <Route path={ROUTES.DISCOUNTS.ROOT} element={<Discounts_Page />} />
           <Route path={ROUTES.DISCOUNTS.PROMOTION} element={<PromotionSetupPage />} />
           <Route path={ROUTES.DISCOUNTS.CLIENT_DISCOUNT} element={<ClientsDiscountPage />} />
@@ -69,8 +74,11 @@ export default function AppRouter() {
           <Route path="sales" element={<Sales_and_orders_Page />} />
           <Route path={ROUTES.SALES.REPORT} element={<SalesReport_Page />} />
           <Route path="suppliers" element={<Suppliers_Page />} />
+          <Route path={ROUTES.SUPPLIERS.WATCH_SUPPLIERS} element={<WatchSuppliers_Page />} />
+          <Route path={ROUTES.SUPPLIERS.REGISTER_SUPPLIER} element={<RegisterSupplier_Page />} />
           <Route path={ROUTES.SUPPLIERS.SUPPLIER_DETAIL} element={<SupplierDetail_Page />} />
-          <Route path="orders/update" element={<UpdateOrder_Page />} />
+          <Route path={ROUTES.ORDERS.UPDATE} element={<UpdateOrder_Page />} />
+          <Route path={ROUTES.ORDERS.DETAIL} element={<OrderDetail_Page />} />
           <Route path="products/watch" element={<WatchProducts_Page />} />
           <Route path='destinationAccount/register' element={<RegisterDestinationAccount_Page/>} />
         </Route>

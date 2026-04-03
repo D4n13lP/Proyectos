@@ -37,14 +37,14 @@ export default function SuppliersMenu_Page() {
           <MenuCard 
             label="Ver proveedores" 
             icon={Users} 
-            path="/suppliers/list" 
+            path="/suppliers/watch" 
             bgColor="bg-[#3ab0e2]" 
           />
           
           <MenuCard 
             label="Registrar proveedor" 
             icon={UserPlus} 
-            path="/suppliers/new" 
+            path="/suppliers/register" 
             bgColor="bg-[#ffcc33]" 
           />
           

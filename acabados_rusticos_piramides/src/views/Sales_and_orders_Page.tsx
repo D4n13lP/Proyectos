@@ -51,7 +51,7 @@ export default function SalesMenu_Page() {
           <MenuCard 
             label="Registrar Cuenta destino" 
             icon={Wallet} 
-            path="/sales/destination-account" 
+            path="/destinationAccount/register" 
             bgColor="bg-[#5d1209]" // Color café/oscuro de la imagen
           />
           

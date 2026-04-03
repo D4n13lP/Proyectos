@@ -17,6 +17,8 @@ export const ROUTES = {
 
   SUPPLIERS: {
     ROOT: "/suppliers",
+    WATCH_SUPPLIERS: "/suppliers/watch",
+    REGISTER_SUPPLIER: "/suppliers/register",
     SUPPLIER_DETAIL: "/suppliers/detail",
   },
 
@@ -29,6 +31,8 @@ export const ROUTES = {
   ORDERS: {
     ROOT: "/orders",
     REGISTER: "/orders/register",
+    UPDATE: "/orders/update",
+    DETAIL: "/orders/detail",
     REPORT: "/orders/report",
   },
 
@@ -40,6 +44,7 @@ export const ROUTES = {
   },
 
   ACCOUNT: "/account",
+  DELIVERYMEN: "/deliverymen",
 } as const;
 
   

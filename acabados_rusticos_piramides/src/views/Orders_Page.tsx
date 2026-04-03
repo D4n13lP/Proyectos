@@ -1,6 +1,7 @@
 import { FileEdit, FileText, Receipt } from 'lucide-react';
 import MenuCard from '../components/MenuCard';
 import logoEmpresa from '../assets/logo_empresa.jpg';
+import { ROUTES } from '../routes';
 
 export default function OrdersMenu_Page() {
   return (
@@ -30,14 +31,14 @@ export default function OrdersMenu_Page() {
           <MenuCard 
             label="Actualizar pedido" 
             icon={FileEdit} 
-            path="/orders/update" 
+            path={ROUTES.ORDERS.UPDATE} 
             bgColor="bg-[#74c9f1]" 
           />
           
           <MenuCard 
             label="Reporte Pedidos" 
             icon={FileText} 
-            path="/orders/reports" 
+            path={ROUTES.ORDERS.REPORT} 
             bgColor="bg-[#fcd34d]" 
           />
           
