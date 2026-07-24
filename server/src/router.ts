@@ -1,27 +1,9 @@
-import {Router} from 'express'
-import server from './server'
+// src/router.ts
+import { Router } from 'express'
+import productRouter from './routes/product.routes.js'
 
 const router = Router()
 
-// Routing
-router.get('/', (req, res) => {
-    res.json('Desde GET')
-})
-
-router.post('/', (req, res) => {
-    res.json('Desde POST')
-})
-
-router.put('/', (req, res) => {
-    res.json('Desde PUT')
-})
-
-router.patch('/', (req, res) => {
-    res.json('Desde PATCH')
-})
-
-router.delete('/', (req, res) => {
-    res.json('Desde DELETE')
-})
+router.use('/api/products', productRouter)
 
 export default router
