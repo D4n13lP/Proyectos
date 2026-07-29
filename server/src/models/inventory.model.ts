@@ -3,7 +3,7 @@ import { BelongsTo, Column, DataType, Default, ForeignKey, Model, PrimaryKey, Ta
 import { Product } from './product.model.js';
 import { Warehouse } from './warehouse.model.js';
 
-@Table({ tableName: 'inventory' })
+@Table({ tableName: 'inventory', timestamps: false })
 export class Inventory extends Model {
   @Default(DataType.UUIDV4)
   @PrimaryKey

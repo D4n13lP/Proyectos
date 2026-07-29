@@ -3,7 +3,7 @@ import { BelongsTo, Column, DataType, Default, ForeignKey, Model, PrimaryKey, Ta
 import { DestAccount } from './destAccount.model.js';
 import { Transaction } from './transaction.model.js';
 
-@Table({ tableName: 'paymentHistory' })
+@Table({ tableName: 'paymentHistory', timestamps: false })
 export class PaymentHistory extends Model {
   @Default(DataType.UUIDV4)
   @PrimaryKey

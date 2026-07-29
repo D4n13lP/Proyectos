@@ -11,7 +11,7 @@ import { SuppProd } from './suppProd.model.js';
 import { Supplier } from './supplier.model.js';
 import { TransDetail } from './transDetail.model.js';
 
-@Table({ tableName: 'product' })
+@Table({ tableName: 'product', timestamps: false })
 export class Product extends Model {
   @Default(DataType.UUIDV4)
   @PrimaryKey

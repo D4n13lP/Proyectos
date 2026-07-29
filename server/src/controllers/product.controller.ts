@@ -1,6 +1,6 @@
 // src/controllers/product.controller.ts
 import type { Request, Response } from 'express'
-import { Product, Category, ProductUnit } from '../models/index.js'
+import { Product, Category, ProductUnit, Picture, Promo } from '../models/index.js'
 
 export async function createProduct(req: Request, res: Response) {
     try {
@@ -14,7 +14,7 @@ export async function createProduct(req: Request, res: Response) {
 export async function getProducts(req: Request, res: Response) {
     try {
         const products = await Product.findAll({
-            include: [Category, ProductUnit],
+            include: [Category, ProductUnit, Picture, Promo],
             order: [['productName', 'ASC']],
         })
         res.json(products)
@@ -26,7 +26,7 @@ export async function getProducts(req: Request, res: Response) {
 export async function getProductById(req: Request, res: Response) {
     try {
         const product = await Product.findByPk(req.params.prodCode, {
-            include: [Category, ProductUnit],
+            include: [Category, ProductUnit, Picture, Promo],
         })
         if (!product) {
             res.status(404).json({ message: 'Producto no encontrado' })

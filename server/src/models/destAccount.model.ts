@@ -4,7 +4,7 @@ import { PaymentHistory } from './paymentHistory.model.js';
 import { TransDestAcc } from './transDestAcc.model.js';
 import { Transaction } from './transaction.model.js';
 
-@Table({ tableName: 'destAccount' })
+@Table({ tableName: 'destAccount', timestamps: false })
 export class DestAccount extends Model {
   @PrimaryKey
   @Column({ type: DataType.CHAR(18) })

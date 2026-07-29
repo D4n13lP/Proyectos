@@ -2,7 +2,7 @@
 import { Column, DataType, Default, HasMany, Model, PrimaryKey, Table } from 'sequelize-typescript';
 import { TransDetail } from './transDetail.model.js';
 
-@Table({ tableName: 'transDiscount' })
+@Table({ tableName: 'transDiscount', timestamps: false })
 export class TransDiscount extends Model {
   @Default(DataType.UUIDV4)
   @PrimaryKey

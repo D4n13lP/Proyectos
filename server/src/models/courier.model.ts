@@ -3,7 +3,7 @@ import { BelongsToMany, Column, DataType, Default, HasMany, Model, PrimaryKey, T
 import { TransCourier } from './transCourier.model.js';
 import { Transaction } from './transaction.model.js';
 
-@Table({ tableName: 'courier' })
+@Table({ tableName: 'courier', timestamps: false })
 export class Courier extends Model {
   @Default(DataType.UUIDV4)
   @PrimaryKey

@@ -2,7 +2,7 @@
 import { Column, DataType, Default, HasMany, Model, PrimaryKey, Table } from 'sequelize-typescript';
 import { Product } from './product.model.js';
 
-@Table({ tableName: 'productUnit' })
+@Table({ tableName: 'productUnit', timestamps: false })
 export class ProductUnit extends Model {
   @Default(DataType.UUIDV4)
   @PrimaryKey

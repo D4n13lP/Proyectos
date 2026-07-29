@@ -3,7 +3,7 @@ import { Column, DataType, Default, HasMany, Model, PrimaryKey, Table } from 'se
 import { Category } from './category.model.js';
 import { Product } from './product.model.js';
 
-@Table({ tableName: 'promo' })
+@Table({ tableName: 'promo', timestamps: false })
 export class Promo extends Model {
   @Default(DataType.UUIDV4)
   @PrimaryKey

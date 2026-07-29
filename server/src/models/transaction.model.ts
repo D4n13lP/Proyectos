@@ -10,7 +10,7 @@ import { TransDetail } from './transDetail.model.js';
 import { TransUser } from './transUser.model.js';
 import { User } from './user.model.js';
 
-@Table({ tableName: 'transaction' })
+@Table({ tableName: 'transaction', timestamps: false })
 export class Transaction extends Model {
   @Default(DataType.UUIDV4)
   @PrimaryKey

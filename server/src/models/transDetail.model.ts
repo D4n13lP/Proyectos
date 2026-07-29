@@ -4,7 +4,7 @@ import { Product } from './product.model.js';
 import { TransDiscount } from './transDiscount.model.js';
 import { Transaction } from './transaction.model.js';
 
-@Table({ tableName: 'transDetail' })
+@Table({ tableName: 'transDetail', timestamps: false })
 export class TransDetail extends Model {
   @Default(DataType.UUIDV4)
   @PrimaryKey

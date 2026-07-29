@@ -4,7 +4,7 @@ import { TotalCash } from './totalCash.model.js';
 import { TransUser } from './transUser.model.js';
 import { Transaction } from './transaction.model.js';
 
-@Table({ tableName: 'user' })
+@Table({ tableName: 'user', timestamps: false })
 export class User extends Model {
   @Default(DataType.UUIDV4)
   @PrimaryKey

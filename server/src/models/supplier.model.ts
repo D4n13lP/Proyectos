@@ -3,7 +3,7 @@ import { BelongsToMany, Column, DataType, Default, HasMany, Model, PrimaryKey, T
 import { Product } from './product.model.js';
 import { SuppProd } from './suppProd.model.js';
 
-@Table({ tableName: 'supplier' })
+@Table({ tableName: 'supplier', timestamps: false })
 export class Supplier extends Model {
   @Default(DataType.UUIDV4)
   @PrimaryKey

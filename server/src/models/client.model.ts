@@ -2,7 +2,7 @@
 import { Column, DataType, Default, HasMany, Model, PrimaryKey, Table } from 'sequelize-typescript';
 import { Transaction } from './transaction.model.js';
 
-@Table({ tableName: 'client' })
+@Table({ tableName: 'client', timestamps: false })
 export class Client extends Model {
   @Default(DataType.UUIDV4)
   @PrimaryKey
