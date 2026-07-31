@@ -36,27 +36,44 @@ export default function RegisterDestinationAccount_Page() {
   const handleDelete = async (clabe: string, alias: string) => {
     const isConfirmed = window.confirm(`¿Estás seguro de que deseas eliminar la cuenta "${alias}"?`);
     if (isConfirmed) {
-      await deleteDestAccount(clabe);
-      setAccounts(accounts.filter(acc => acc.clabe !== clabe));
-      if (expandedAccountId === clabe) {
-        setExpandedAccountId(null);
+      try {
+        await deleteDestAccount(clabe);
+        setAccounts(accounts.filter(acc => acc.clabe !== clabe));
+        if (expandedAccountId === clabe) {
+          setExpandedAccountId(null);
+        }
+      } catch (error: any) {
+        alert(error?.response?.data?.message || 'Ocurrió un error al eliminar la cuenta.');
       }
     }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    // La CLABE solo acepta dígitos (la base de datos exige exactamente 18)
+    const cleanValue = name === 'clabe' ? value.replace(/\D/g, '').slice(0, 18) : value;
+    setFormData(prev => ({ ...prev, [name]: cleanValue }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.accountAlias || !formData.holderName || !formData.clabe) return;
+    if (!formData.accountAlias || !formData.holderName || !formData.clabe) {
+      alert('Alias de cuenta, Nombre titular y Cuenta Clabe son obligatorios.');
+      return;
+    }
+    if (!/^\d{18}$/.test(formData.clabe)) {
+      alert('La Cuenta Clabe debe tener exactamente 18 dígitos numéricos.');
+      return;
+    }
 
-    const newAccount = await createDestAccount(formData);
-    setAccounts([...accounts, newAccount]);
-    setFormData({ accountAlias: '', holderName: '', bank: '', accountNumber: '', clabe: '' });
-    alert('Cuenta agregada exitosamente');
+    try {
+      const newAccount = await createDestAccount(formData);
+      setAccounts([...accounts, newAccount]);
+      setFormData({ accountAlias: '', holderName: '', bank: '', accountNumber: '', clabe: '' });
+      alert('Cuenta agregada exitosamente');
+    } catch (error: any) {
+      alert(error?.response?.data?.message || 'Ocurrió un error al agregar la cuenta.');
+    }
   };
 
   return (
@@ -246,7 +263,9 @@ export default function RegisterDestinationAccount_Page() {
                 value={formData.clabe}
                 onChange={handleChange}
                 required
+                inputMode="numeric"
                 maxLength={18}
+                placeholder="18 dígitos"
                 className="w-2/3 border border-gray-300 rounded py-1.5 px-3 text-gray-800 text-sm focus:outline-none focus:border-[#3ab0e2]"
               />
             </div>

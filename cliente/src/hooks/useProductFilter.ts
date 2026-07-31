@@ -1,8 +1,7 @@
 import { useState, useMemo } from 'react'
 import { type Product } from '../types'
 
-export function useProductFilter(initialProducts: Product[]) {
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
+export function useProductFilter(initialProducts: Product[], selectedCategory: string | null = null) {
   const [searchCode, setSearchCode] = useState('')
   const [searchName, setSearchName] = useState('')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
@@ -40,14 +39,12 @@ export function useProductFilter(initialProducts: Product[]) {
 
   return {
     // Estados
-    selectedCategory,
     searchCode,
     searchName,
     sortOrder,
     // Resultados
     filteredProducts,
     // Funciones para actualizar
-    setSelectedCategory,
     setSearchCode,
     setSearchName,
     toggleSortOrder: () => setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')

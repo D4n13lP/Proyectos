@@ -45,9 +45,10 @@ export default function RegisterProducts_Page() {
     e.preventDefault();
 
     try {
+      const trimmedCategoria = formData.categoria.trim();
       const existingCategories = await getCategories();
-      const existing = existingCategories.find(c => c.categoryName.toLowerCase() === formData.categoria.toLowerCase());
-      const categoryID = existing ? existing.categoryID : (await createCategory(formData.categoria)).categoryID;
+      const existing = existingCategories.find(c => c.categoryName.trim().toLowerCase() === trimmedCategoria.toLowerCase());
+      const categoryID = existing ? existing.categoryID : (await createCategory(trimmedCategoria)).categoryID;
 
       const newProduct = await createProduct({
         productName: formData.nombre,

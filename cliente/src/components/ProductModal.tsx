@@ -191,7 +191,9 @@ import {
 } from "lucide-react";
 import { useAppStore } from "../stores/useAppStore";
 import { updateProduct, deleteProduct } from "../api/products";
-import type { Picture, Product } from "../types";
+import { getCategories, createCategory } from "../api/categories";
+import { uploadPicture, deletePicture } from "../api/pictures";
+import type { Category, Picture, Product } from "../types";
 
 const PLACEHOLDER_IMAGE = 'data:image/svg+xml;utf8,' + encodeURIComponent(
   '<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600"><rect width="600" height="600" fill="#e5e7eb"/><text x="50%" y="50%" font-family="sans-serif" font-size="28" fill="#9ca3af" text-anchor="middle" dominant-baseline="middle">Sin imagen</text></svg>'
@@ -212,14 +214,21 @@ export default function ProductModal() {
   const [formData, setFormData] = useState<Product | null>(selectedProduct);
   // Imágenes agregadas/reemplazadas localmente en esta sesión (no se persisten, ver plan de Fase 1)
   const [localPictures, setLocalPictures] = useState<Picture[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [categoryInput, setCategoryInput] = useState('');
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    getCategories().then(setCategories);
+  }, []);
 
   // Sincronizar datos al abrir
   useEffect(() => {
     if (selectedProduct) {
       setFormData(selectedProduct);
       setLocalPictures(selectedProduct.pictures || []);
+      setCategoryInput(selectedProduct.category?.categoryName || '');
       setCurrentImgIndex(0);
       setIsEditing(false);
     }
@@ -243,21 +252,21 @@ export default function ProductModal() {
     );
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file && file.type.startsWith("image/")) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
+      const oldPicture = localPictures[currentImgIndex];
+      try {
+        const uploaded = await uploadPicture(formData.prodCode, file);
         const nuevas = [...localPictures];
-        const link = event.target?.result as string;
-        if (nuevas[currentImgIndex]) {
-          nuevas[currentImgIndex] = { ...nuevas[currentImgIndex], link };
-        } else {
-          nuevas[currentImgIndex] = { pictureID: `local-${Date.now()}`, link };
-        }
+        nuevas[currentImgIndex] = uploaded;
         setLocalPictures(nuevas);
-      };
-      reader.readAsDataURL(file);
+        if (oldPicture) {
+          await deletePicture(oldPicture.pictureID).catch(() => {});
+        }
+      } catch (error: any) {
+        alert(error?.response?.data?.message || "No se pudo subir la imagen.");
+      }
     }
   };
 
@@ -267,6 +276,24 @@ export default function ProductModal() {
       return;
     }
     try {
+      // Resolver la categoría escrita: usar la existente por nombre o crear una nueva
+      let categoryID = formData.categoryID ?? null;
+      const trimmedCategory = categoryInput.trim();
+      if (trimmedCategory !== (formData.category?.categoryName || '').trim()) {
+        if (!trimmedCategory) {
+          categoryID = null;
+        } else {
+          const existing = categories.find((c) => c.categoryName.trim().toLowerCase() === trimmedCategory.toLowerCase());
+          if (existing) {
+            categoryID = existing.categoryID;
+          } else {
+            const created = await createCategory(trimmedCategory);
+            categoryID = created.categoryID;
+            setCategories((prev) => [...prev, created]);
+          }
+        }
+      }
+
       const updated = await updateProduct(formData.prodCode, {
         productName: formData.productName,
         sku: formData.sku,
@@ -274,6 +301,7 @@ export default function ProductModal() {
         salePrice: formData.salePrice,
         lowStock: formData.lowStock,
         description: formData.description,
+        categoryID,
       });
       const merged = { ...formData, ...updated };
       setFormData(merged);
@@ -372,19 +400,17 @@ export default function ProductModal() {
                       const fileInput = document.createElement("input");
                       fileInput.type = "file";
                       fileInput.accept = "image/*";
-                      fileInput.onchange = (e: any) => {
+                      fileInput.onchange = async (e: any) => {
                         const file = e.target.files?.[0];
                         if (file && file.type.startsWith("image/")) {
-                          const reader = new FileReader();
-                          reader.onload = (event) => {
-                            const nuevas = [
-                              ...localPictures,
-                              { pictureID: `local-${Date.now()}`, link: event.target?.result as string },
-                            ];
+                          try {
+                            const uploaded = await uploadPicture(formData.prodCode, file);
+                            const nuevas = [...localPictures, uploaded];
                             setLocalPictures(nuevas);
                             setCurrentImgIndex(nuevas.length - 1);
-                          };
-                          reader.readAsDataURL(file);
+                          } catch (error: any) {
+                            alert(error?.response?.data?.message || "No se pudo subir la imagen.");
+                          }
                         }
                       };
                       fileInput.click();
@@ -407,7 +433,7 @@ export default function ProductModal() {
                       {[
                         { k: "prodCode", l: "Código de producto:", ed: false, money: false },
                         { k: "sku", l: "SKU:", ed: true, money: false },
-                        { k: "category", l: "Categoría:", ed: false, money: false, display: formData.category?.categoryName || "Sin categoría" },
+                        { k: "category", l: "Categoría:", ed: true, money: false, select: true, display: formData.category?.categoryName || "Sin categoría" },
                         { k: "unit", l: "Unidad:", ed: false, money: false, display: formData.unit?.produnitName || "---" },
                         { k: "cost", l: "Costo:", ed: true, money: true },
                         { k: "salePrice", l: "Precio de venta:", ed: true, money: true },
@@ -421,7 +447,22 @@ export default function ProductModal() {
                             {row.l}
                           </td>
                           <td className="px-6 py-4">
-                            {isEditing && row.ed ? (
+                            {isEditing && row.ed && row.select ? (
+                              <>
+                                <input
+                                  list="productModalCategoriesList"
+                                  className="w-full border-b-2 border-emerald-400 outline-none px-1 bg-transparent font-bold text-gray-800"
+                                  value={categoryInput}
+                                  onChange={(e) => setCategoryInput(e.target.value)}
+                                  placeholder="Escribe o elige una categoría"
+                                />
+                                <datalist id="productModalCategoriesList">
+                                  {categories.map((c) => (
+                                    <option key={c.categoryID} value={c.categoryName} />
+                                  ))}
+                                </datalist>
+                              </>
+                            ) : isEditing && row.ed ? (
                               <input
                                 type={row.money || row.k === "lowStock" ? "number" : "text"}
                                 className="w-full border-b-2 border-emerald-400 outline-none px-1 bg-transparent font-bold text-gray-800"
@@ -507,6 +548,7 @@ export default function ProductModal() {
                     setIsEditing(false);
                     setFormData(selectedProduct);
                     setLocalPictures(selectedProduct.pictures || []);
+                    setCategoryInput(selectedProduct.category?.categoryName || '');
                   }}
                   className="bg-gray-400 hover:bg-gray-500 text-white px-12 py-4 rounded-2xl font-black shadow-xl transition-all cursor-pointer flex items-center gap-3 uppercase"
                 >

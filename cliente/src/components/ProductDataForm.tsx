@@ -3,19 +3,23 @@ import * as React from 'react'
 import { X } from 'lucide-react'
 import { getCategories } from '../api/categories'
 import { getProductUnits } from '../api/productUnits'
+import { uploadPicture, deletePicture } from '../api/pictures'
+import type { Picture } from '../types'
 
 interface ProductDataFormProps {
   onDataChange?: (data: any) => void
+  prodCode?: string
+  sku?: string
 }
 
-export default function ProductDataForm({ onDataChange }: ProductDataFormProps) {
+export default function ProductDataForm({ onDataChange, prodCode, sku }: ProductDataFormProps) {
   const [categories, setCategories] = useState<string[]>([])
   const [currencies, setCurrencies] = useState<string[]>([])
   const [units, setUnits] = useState<string[]>([])
+  const [pictures, setPictures] = useState<Picture[]>([])
+  const [uploading, setUploading] = useState(false)
 
   const [formData, setFormData] = useState({
-    codigo: '',
-    sku: '',
     nombre: '',
     categoria: '',
     costo: '',
@@ -25,8 +29,6 @@ export default function ProductDataForm({ onDataChange }: ProductDataFormProps) 
     unidadesStockBajo: '',
     proveedor: '',
     descripcion: '',
-    imagenes: [] as File[],
-    imagenesPrevisualizacion: [] as string[]
   })
 
   useEffect(() => {
@@ -45,57 +47,41 @@ export default function ProductDataForm({ onDataChange }: ProductDataFormProps) 
 
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      const filesArray = Array.from(e.target.files)
-      
-      // Limitar a máximo 10 imágenes en total
-      const availableSlots = 10 - formData.imagenes.length
-      const filesToAdd = filesArray.slice(0, availableSlots)
-      
-      if (filesToAdd.length < filesArray.length) {
-        alert("Solo se permite un máximo de 10 imágenes por producto.")
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || !prodCode) return
+    const filesArray = Array.from(e.target.files)
+
+    // Limitar a máximo 10 imágenes en total
+    const availableSlots = 10 - pictures.length
+    const filesToAdd = filesArray.slice(0, availableSlots)
+
+    if (filesToAdd.length < filesArray.length) {
+      alert("Solo se permite un máximo de 10 imágenes por producto.")
+    }
+
+    setUploading(true)
+    try {
+      const uploaded = await Promise.all(filesToAdd.map((file) => uploadPicture(prodCode, file)))
+      setPictures((prev) => [...prev, ...uploaded])
+    } catch (error: any) {
+      alert(error?.response?.data?.message || 'Ocurrió un error al subir la imagen.')
+    } finally {
+      setUploading(false)
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
       }
-
-      const newImages = [...formData.imagenes, ...filesToAdd]
-      
-      const prevPromises = filesToAdd.map(file => {
-        return new Promise<string>((resolve) => {
-          const reader = new FileReader()
-          reader.onload = (event) => resolve(event.target?.result as string)
-          reader.readAsDataURL(file)
-        })
-      })
-
-      Promise.all(prevPromises).then(newPreviews => {
-        const updatedPreviews = [...formData.imagenesPrevisualizacion, ...newPreviews]
-        const newData = {
-          ...formData,
-          imagenes: newImages,
-          imagenesPrevisualizacion: updatedPreviews
-        }
-        setFormData(newData)
-        if (onDataChange) onDataChange(newData)
-        
-        // Limpiar el input file
-        if (fileInputRef.current) {
-          fileInputRef.current.value = ''
-        }
-      })
     }
   }
 
-  const removeImage = (indexToRemove: number) => {
-    const updatedImages = formData.imagenes.filter((_, i) => i !== indexToRemove)
-    const updatedPreviews = formData.imagenesPrevisualizacion.filter((_, i) => i !== indexToRemove)
-    
-    const newData = {
-      ...formData,
-      imagenes: updatedImages,
-      imagenesPrevisualizacion: updatedPreviews
+  const removeImage = async (indexToRemove: number) => {
+    const picture = pictures[indexToRemove]
+    if (!picture) return
+    try {
+      await deletePicture(picture.pictureID)
+      setPictures((prev) => prev.filter((_, i) => i !== indexToRemove))
+    } catch (error: any) {
+      alert(error?.response?.data?.message || 'Ocurrió un error al eliminar la imagen.')
     }
-    setFormData(newData)
-    if (onDataChange) onDataChange(newData)
   }
 
   return (
@@ -104,8 +90,8 @@ export default function ProductDataForm({ onDataChange }: ProductDataFormProps) 
       <div className="w-full md:w-[250px] flex-shrink-0 flex flex-col items-center">
         {/* Imagen Principal */}
         <div className="w-full aspect-square bg-[#e6e6e6] rounded border border-gray-300 flex items-center justify-center relative overflow-hidden group">
-          {formData.imagenesPrevisualizacion.length > 0 ? (
-            <img src={formData.imagenesPrevisualizacion[0]} alt="Principal" className="w-full h-full object-cover" />
+          {pictures.length > 0 ? (
+            <img src={pictures[0].link} alt="Principal" className="w-full h-full object-cover" />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center opacity-40">
               <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="#a0a0a0" strokeWidth="1">
@@ -118,8 +104,8 @@ export default function ProductDataForm({ onDataChange }: ProductDataFormProps) 
               </svg>
             </div>
           )}
-          {formData.imagenesPrevisualizacion.length > 0 && (
-             <button 
+          {pictures.length > 0 && (
+             <button
                 onClick={(e) => { e.stopPropagation(); removeImage(0); }}
                 className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
               >
@@ -127,14 +113,14 @@ export default function ProductDataForm({ onDataChange }: ProductDataFormProps) 
               </button>
           )}
         </div>
-        
+
         {/* Sub-imágenes (miniaturas) */}
-        {formData.imagenesPrevisualizacion.length > 1 && (
+        {pictures.length > 1 && (
           <div className="mt-3 flex gap-2 overflow-x-auto w-full pb-2 px-1 custom-scrollbar">
-            {formData.imagenesPrevisualizacion.slice(1).map((preview, idx) => (
-              <div key={idx + 1} className="w-12 h-12 flex-shrink-0 bg-gray-100 rounded border border-gray-300 relative group">
-                <img src={preview} alt={`Miniatura ${idx + 1}`} className="w-full h-full object-cover rounded" />
-                <button 
+            {pictures.slice(1).map((picture, idx) => (
+              <div key={picture.pictureID} className="w-12 h-12 flex-shrink-0 bg-gray-100 rounded border border-gray-300 relative group">
+                <img src={picture.link} alt={`Miniatura ${idx + 1}`} className="w-full h-full object-cover rounded" />
+                <button
                   onClick={() => removeImage(idx + 1)}
                   className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
                 >
@@ -155,13 +141,13 @@ export default function ProductDataForm({ onDataChange }: ProductDataFormProps) 
         />
         <button
           onClick={() => fileInputRef.current?.click()}
-          disabled={formData.imagenes.length >= 10}
-          className={`mt-4 bg-[#3ab0e2] hover:bg-[#16A085] text-white py-2 px-4 rounded text-sm transition-colors duration-300 w-full font-medium ${formData.imagenes.length >= 10 ? 'opacity-50 cursor-not-allowed' : ''}`}
+          disabled={pictures.length >= 10 || !prodCode || uploading}
+          className={`mt-4 bg-[#3ab0e2] hover:bg-[#16A085] text-white py-2 px-4 rounded text-sm transition-colors duration-300 w-full font-medium ${pictures.length >= 10 || !prodCode || uploading ? 'opacity-50 cursor-not-allowed' : ''}`}
         >
-          Seleccionar archivo(s)
+          {uploading ? 'Subiendo…' : 'Seleccionar archivo(s)'}
         </button>
         <span className="text-xs text-gray-400 mt-2">
-          {formData.imagenes.length} / 10 imágenes
+          {pictures.length} / 10 imágenes
         </span>
       </div>
 
@@ -179,25 +165,26 @@ export default function ProductDataForm({ onDataChange }: ProductDataFormProps) 
         </datalist>
 
         <div className="grid grid-cols-12 gap-y-5 gap-x-4">
-          {/* Fila 1 */}
+          {/* Fila 1: Código y SKU los genera la base de datos, aquí solo se muestran */}
           <div className="col-span-12 sm:col-span-3">
             <input
               type="text"
-              name="codigo"
-              value={formData.codigo}
-              onChange={handleInputChange}
+              value={prodCode ? prodCode.slice(0, 8).toUpperCase() : 'Generando…'}
+              readOnly
+              disabled
+              title={prodCode}
               placeholder="Código"
-              className="w-full px-3 py-2 border border-gray-300 rounded focus:border-[#3ab0e2] focus:outline-none placeholder-gray-400 text-sm font-medium"
+              className="w-full px-3 py-2 border border-gray-200 rounded bg-gray-100 text-gray-500 placeholder-gray-400 text-sm font-medium cursor-not-allowed"
             />
           </div>
           <div className="col-span-12 sm:col-span-3">
             <input
               type="text"
-              name="sku"
-              value={formData.sku}
-              onChange={handleInputChange}
+              value={sku || 'Generando…'}
+              readOnly
+              disabled
               placeholder="SKU"
-              className="w-full px-3 py-2 border border-gray-300 rounded focus:border-[#3ab0e2] focus:outline-none placeholder-gray-400 text-sm font-medium"
+              className="w-full px-3 py-2 border border-gray-200 rounded bg-gray-100 text-gray-500 placeholder-gray-400 text-sm font-medium cursor-not-allowed"
             />
           </div>
           <div className="col-span-12 sm:col-span-6">

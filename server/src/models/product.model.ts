@@ -51,7 +51,7 @@ export class Product extends Model {
   @ForeignKey(() => Promo)
   @Column({ type: DataType.UUID, allowNull: true })
   declare discountID: string;
-
+                                
   @BelongsTo(() => Promo)
   declare promo?: Promo;
 

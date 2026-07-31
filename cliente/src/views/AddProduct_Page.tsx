@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ArrowLeft, PackagePlus } from 'lucide-react'
 import logoEmpresa from '../assets/logo_empresa.jpg'
@@ -6,7 +6,7 @@ import ProductTabs from '../components/ProductTabs'
 import ProductDataForm from '../components/ProductDataForm'
 import WarehouseSupplierForm from '../components/WarehouseSupplierForm'
 import SalesPriceForm from '../components/SalesPriceForm'
-import { createProduct } from '../api/products'
+import { createProduct, updateProduct, deleteProduct } from '../api/products'
 import { getCategories, createCategory } from '../api/categories'
 import { getProductUnits, createProductUnit } from '../api/productUnits'
 import { getWarehouses, createWarehouse } from '../api/warehouses'
@@ -15,6 +15,7 @@ import { linkSupplierProduct } from '../api/suppProd'
 import { createInventory } from '../api/inventory'
 import { getTimeUnits, createTimeUnit } from '../api/timeUnits'
 import { createSalesExpectation } from '../api/salesExpectations'
+import type { Product } from '../types'
 
 export default function AddProduct_Page() {
   const navigate = useNavigate()
@@ -23,6 +24,48 @@ export default function AddProduct_Page() {
     almacenProveedor: {},
     precioVenta: {}
   })
+
+  // El código y el SKU los genera la base de datos: apenas se abre el formulario
+  // se reserva un producto borrador (nombre vacío) para poder mostrarlos.
+  // Si el usuario sale sin terminar, ese borrador se elimina (ver efectos abajo).
+  const [draftProduct, setDraftProduct] = useState<Product | null>(null)
+  const draftRef = useRef<Product | null>(null)
+  const completedRef = useRef(false)
+
+  useEffect(() => {
+    let cancelled = false
+
+    createProduct({ productName: '', prodType: 'warehouse', cost: 0, salePrice: 0, lowStock: 0 })
+      .then((created) => {
+        if (cancelled) {
+          // el usuario ya salió antes de que terminara de generarse el código
+          deleteProduct(created.prodCode).catch(() => {})
+          return
+        }
+        draftRef.current = created
+        setDraftProduct(created)
+      })
+      .catch(() => {
+        if (!cancelled) alert('No se pudo reservar un código de producto. Intenta de nuevo.')
+      })
+
+    const cleanupOnUnload = () => {
+      if (!completedRef.current && draftRef.current) {
+        // best-effort: si se cierra la pestaña, el navegador puede no completar la petición
+        fetch(`/api/products/${draftRef.current.prodCode}`, { method: 'DELETE', keepalive: true }).catch(() => {})
+      }
+    }
+    window.addEventListener('beforeunload', cleanupOnUnload)
+
+    return () => {
+      cancelled = true
+      window.removeEventListener('beforeunload', cleanupOnUnload)
+      // el usuario navegó a otra pantalla de la SPA sin terminar el registro
+      if (!completedRef.current && draftRef.current) {
+        deleteProduct(draftRef.current.prodCode).catch(() => {})
+      }
+    }
+  }, [])
 
   const handleDataChange = (tabType: string, data: any) => {
     setProductData(prev => ({
@@ -34,18 +77,23 @@ export default function AddProduct_Page() {
   const handleSubmit = async () => {
     const { producto, almacenProveedor, precioVenta } = productData
 
-    if (!producto?.nombre || !producto?.sku) {
-      alert('Completa al menos el nombre y el SKU del producto.')
+    if (!draftProduct) {
+      alert('Espera a que se genere el código del producto.')
+      return
+    }
+    if (!producto?.nombre) {
+      alert('Completa al menos el nombre del producto.')
       return
     }
 
     try {
       // 1. Categoría: usar existente por nombre o crear una nueva
       let categoryID: string | undefined
-      if (producto.categoria) {
+      const trimmedCategoria = producto.categoria?.trim()
+      if (trimmedCategoria) {
         const categories = await getCategories()
-        const existing = categories.find(c => c.categoryName.toLowerCase() === producto.categoria.toLowerCase())
-        categoryID = existing ? existing.categoryID : (await createCategory(producto.categoria)).categoryID
+        const existing = categories.find(c => c.categoryName.trim().toLowerCase() === trimmedCategoria.toLowerCase())
+        categoryID = existing ? existing.categoryID : (await createCategory(trimmedCategoria)).categoryID
       }
 
       // 2. Unidad: usar existente por nombre o crear una nueva
@@ -56,12 +104,10 @@ export default function AddProduct_Page() {
         produnitID = existing ? existing.produnitID : (await createProductUnit(producto.unidades)).produnitID
       }
 
-      // 3. Crear el producto
-      const newProduct = await createProduct({
+      // 3. Completar el producto borrador con los datos reales
+      const newProduct = await updateProduct(draftProduct.prodCode, {
         productName: producto.nombre,
-        sku: producto.sku,
         description: producto.descripcion,
-        prodType: 'warehouse',
         cost: Number(producto.costo) || 0,
         currencyCost: producto.moneda || 'MXN',
         salePrice: Number(precioVenta?.precioVenta) || 0,
@@ -112,6 +158,7 @@ export default function AddProduct_Page() {
         await createSalesExpectation({ prodCode: newProduct.prodCode, timeunitID, quantity: Number(precioVenta.cantidad) })
       }
 
+      completedRef.current = true
       alert('Producto registrado correctamente')
       navigate('/products')
     } catch (error: any) {
@@ -128,7 +175,11 @@ export default function AddProduct_Page() {
       id: 'datos-producto',
       label: 'Datos del producto',
       component: (
-        <ProductDataForm onDataChange={(data) => handleDataChange('producto', data)} />
+        <ProductDataForm
+          prodCode={draftProduct?.prodCode}
+          sku={draftProduct?.sku}
+          onDataChange={(data) => handleDataChange('producto', data)}
+        />
       )
     },
     {

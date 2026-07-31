@@ -120,7 +120,7 @@
 // }
 
 import { useEffect } from 'react'
-import { ArrowLeft, Search, ChevronRight, Package, ArrowUpDown } from 'lucide-react'
+import { ArrowLeft, Search, ChevronRight, Package, ArrowUpDown, X } from 'lucide-react'
 import logoEmpresa from '../assets/logo_empresa.jpg'
 import ProductCard from '../components/ProductCard'
 import ProductModal from '../components/ProductModal' // Importa el modal
@@ -145,13 +145,25 @@ export default function ProductCatalog_Page() {
     getCategories().then(setCategories)
   }, [setProducts, setCategories])
 
+  // Solo mostramos en el filtro las categorías que algún producto esté usando
+  const usedCategories = categories.filter((cat) =>
+    products.some((p) => p.categoryID === cat.categoryID)
+  )
+
+  // Si la categoría seleccionada deja de tener productos, quitamos el filtro
+  useEffect(() => {
+    if (selectedCategory && !usedCategories.some((cat) => cat.categoryID === selectedCategory)) {
+      setSelectedCategory(null)
+    }
+  }, [selectedCategory, usedCategories, setSelectedCategory])
+
   // Hook de filtrado (ahora usa la categoría del Store)
   const {
     searchCode, setSearchCode,
     searchName, setSearchName,
     filteredProducts,
     toggleSortOrder
-  } = useProductFilter(products);
+  } = useProductFilter(products, selectedCategory);
 
   return (
     <div className="min-h-screen bg-white py-4 md:py-8 animate-fade-in">
@@ -205,7 +217,7 @@ export default function ProductCatalog_Page() {
             <h2 className="text-md font-bold text-center text-gray-600 uppercase tracking-widest">Categorías</h2>
           </div>
           <div className="bg-white border border-gray-200 rounded-b-xl shadow-sm overflow-hidden">
-            {categories.map((cat) => (
+            {usedCategories.map((cat) => (
               <button
                 key={cat.categoryID}
                 onClick={() => setSelectedCategory(cat.categoryID === selectedCategory ? null : cat.categoryID)}
@@ -215,7 +227,15 @@ export default function ProductCatalog_Page() {
                     : 'hover:bg-emerald-50 text-gray-500 hover:text-emerald-600'}`}
               >
                 <span className="text-xs font-bold uppercase">{cat.categoryName}</span>
-                <ChevronRight size={14} className={`transition-transform ${selectedCategory === cat.categoryID ? 'translate-x-1' : 'group-hover:translate-x-1'}`} />
+                {selectedCategory === cat.categoryID ? (
+                  <span className="relative inline-flex items-center justify-center w-4 h-4" title="Quitar filtro">
+                    {/* Mouse: flecha por defecto, se convierte en X al pasar el mouse encima */}
+                    <ChevronRight size={14} className="pointer-fine:group-hover:hidden pointer-coarse:hidden" />
+                    <X size={14} className="hidden pointer-fine:group-hover:inline-flex pointer-coarse:inline-flex" />
+                  </span>
+                ) : (
+                  <ChevronRight size={14} className="transition-transform group-hover:translate-x-1" />
+                )}
               </button>
             ))}
           </div>

@@ -4,7 +4,11 @@ import { Category } from '../models/index.js'
 
 export async function createCategory(req: Request, res: Response) {
     try {
-        const item = await Category.create(req.body)
+        const payload = { ...req.body }
+        if (typeof payload.categoryName === 'string') {
+            payload.categoryName = payload.categoryName.trim()
+        }
+        const item = await Category.create(payload)
         res.status(201).json(item)
     } catch (error: any) {
         res.status(400).json({ message: error.message })
@@ -40,7 +44,11 @@ export async function updateCategory(req: Request, res: Response) {
             res.status(404).json({ message: 'Category no encontrado' })
             return
         }
-        await item.update(req.body)
+        const payload = { ...req.body }
+        if (typeof payload.categoryName === 'string') {
+            payload.categoryName = payload.categoryName.trim()
+        }
+        await item.update(payload)
         res.json(item)
     } catch (error: any) {
         res.status(400).json({ message: error.message })

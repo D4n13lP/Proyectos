@@ -6,10 +6,13 @@ import {
     getPictureById,
     updatePicture,
     deletePicture,
+    uploadPicture,
 } from '../controllers/picture.controller.js'
+import upload from '../middleware/upload.js'
 
 const router = Router()
 
+router.post('/upload', upload.single('image'), uploadPicture)
 router.post('/', createPicture)
 router.get('/', getPictures)
 router.get('/:pictureID', getPictureById)
